@@ -42,5 +42,7 @@ APIs: TheMealDB, Nutrionix API, Walmart I/O
 # WIP!
 
 🥫 Live Pantry Tracking: Automatically detect and track what you already have stored to generate recipes and save more on resources.
+
 🍲 Recipe Carryovers: On a tight budget? Pantry Assist will adapt by providing meals in higher quantities to help save costs when buying in bulk.
+
 
