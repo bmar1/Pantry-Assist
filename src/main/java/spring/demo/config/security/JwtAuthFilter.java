@@ -45,7 +45,8 @@ public class JwtAuthFilter extends OncePerRequestFilter{
 			filterChain.doFilter(request, response);
 			return;
 		}
-		
+
+		//Extract token and user details from jwt token, then update context to mark as logged in
 		jwt = authHeader.substring(7);
 		userEmail = jwtService.extractUsername(jwt);
 		System.out.println("Auth header: " + userEmail);

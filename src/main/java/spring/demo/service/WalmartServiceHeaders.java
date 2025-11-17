@@ -1,11 +1,10 @@
 package spring.demo.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.Signature;
@@ -19,9 +18,6 @@ public class WalmartServiceHeaders {
 
     @Value("${walmart.id}")
     private String consumerId;
-
-    @Value("${walmart.key}")
-    private String keyContent;
 
 
     // 1. Consumer ID
@@ -41,23 +37,34 @@ public class WalmartServiceHeaders {
 
     // 4. Auth signature
     public String getWMSecAuthSignature(String timestamp) throws Exception {
-        String message = consumerId + "\n" + timestamp + "\n" + keyVersion + "\n";
+        String stringToSign = consumerId + "\n" + timestamp + "\n" + keyVersion + "\n";
 
-
-        byte[] keyBytes = Base64.getDecoder().decode(keyContent);
-
-        // Rebuild private key
-        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
-        PrivateKey privateKey = KeyFactory.getInstance("RSA").generatePrivate(spec);
-
-        // Sign with SHA256withRSA
+        // Sign with private key
         Signature sig = Signature.getInstance("SHA256withRSA");
-        sig.initSign(privateKey);
-        sig.update(message.getBytes(StandardCharsets.UTF_8));
-        byte[] signed = sig.sign();
+        sig.initSign(loadKey());
+        sig.update(stringToSign.getBytes(StandardCharsets.UTF_8));
+        byte[] signedBytes = sig.sign();
 
-        return Base64.getEncoder().encodeToString(signed);
+
+        return Base64.getEncoder().encodeToString(signedBytes);
     }
+
+
+    @Value("classpath:walmart_private_key.pem")
+    private Resource privateKeyResource;
+
+    private PrivateKey loadKey() throws Exception {
+        String key = new String(privateKeyResource.getInputStream().readAllBytes(), StandardCharsets.UTF_8)
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
+                .replaceAll("\\s+", ""); // remove line breaks
+        byte[] decoded = Base64.getDecoder().decode(key);
+        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decoded);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+
+        return keyFactory.generatePrivate(spec);
+    }
+
 
 
 }

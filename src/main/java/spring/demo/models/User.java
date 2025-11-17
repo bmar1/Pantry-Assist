@@ -36,10 +36,12 @@ public class User implements UserDetails {
 
     
     private UserPreference preferences;
-    
-    @ElementCollection
-    private List<Recipe> mealPlan = new ArrayList<>();
- 
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<UserMealPlan> mealPlans = new ArrayList<>();
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<UserIngredient> groceryList = new ArrayList<>();
     
     
 	public Long getId() {
@@ -49,7 +51,23 @@ public class User implements UserDetails {
 		this.id = id;
 	}
 
-	
+	public List<UserMealPlan> getMealPlan() {
+		return mealPlans;
+	}
+
+	public void setMealPlan(List<UserMealPlan> plan){
+		this.mealPlans = plan;
+	}
+
+
+	public List<UserIngredient> getGroceryList() {
+		return groceryList;
+	}
+
+	public void setGroceryList(List<UserIngredient> groceryList) {
+		this.groceryList = groceryList;
+	}
+
 	public String getEmail() {
 		return email;
 	}
@@ -78,12 +96,7 @@ public class User implements UserDetails {
 	
 	
 	
-	public List<Recipe> getMealPlan() {
-		return mealPlan;
-	}
-	public void setMealPlan(List<Recipe> mealPlan) {
-		this.mealPlan = mealPlan;
-	}
+
 	public UserPreference getPreferences() {
 		return preferences;
 	}
@@ -93,9 +106,9 @@ public class User implements UserDetails {
 	public Role getRole() {
 		return role;
 	}
-	
-	
-	
+
+
+
 
     // getters and setters
     

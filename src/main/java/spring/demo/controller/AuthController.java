@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,15 +36,14 @@ public class AuthController {
 		// create and save new user
 		User user = new User();
 		user.setEmail(request.getEmail());
-		user.setPassword(passwordEncoder.encode(request.getPassword()));
+		user.setPassword(passwordEncoder.encode(request.getPassword())); //encrypt password
 		user.setRole(Role.USER); 
 		
 		//Check if user is present already (if so bad request)
 		if (userRepository.findByEmail(request.getEmail()).isPresent()) {
 		    return ResponseEntity.badRequest().body(new AuthResponse("Email already exists"));
 		}
-		
-		
+
 		userRepository.save(user);
 		String token = jwtService.generateToken(user);
 		return ResponseEntity.ok(new AuthResponse(token));
@@ -59,10 +60,29 @@ public class AuthController {
 
 		User user = userRepository.findByEmail(request.getEmail())
 				.orElseThrow(() -> new UsernameNotFoundException("User not found!"));
-
 	
 		String token = jwtService.generateToken(user);
 		return ResponseEntity.ok(new AuthResponse(token));
 
 	}
+
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> delete(@AuthenticationPrincipal UserDetails userDetails){
+        String email = userDetails.getUsername();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found!"));
+
+        userRepository.delete(user);
+
+
+        if(!userRepository.existsByEmail(email)){
+            return ResponseEntity.ok("Account deleted");
+        }
+        else {
+            return ResponseEntity.status(500).body("Failed to delete");
+        }
+    }
+
+
 }

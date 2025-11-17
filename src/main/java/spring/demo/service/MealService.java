@@ -95,6 +95,7 @@ public class MealService {
     
     // Helper: get full recipe by ID
     public Recipe getMealById(String id) throws Exception {
+        Thread.sleep(50);
         String response = webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/lookup.php").queryParam("i", id).build())
                 .retrieve()

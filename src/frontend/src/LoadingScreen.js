@@ -13,7 +13,7 @@ export default function LoadingScreen() {
         setShow(false);
         navigate("/dashboard");
       }, 500); // fade-out duration
-    }, 5000); // total loading time
+    }, 6500); // total loading time
     return () => clearTimeout(timer);
   }, []);
 
@@ -21,10 +21,9 @@ export default function LoadingScreen() {
 
   return (
     <div
-      className={`fixed inset-0 flex flex-col items-center justify-center z-50 transition-opacity duration-500 ${
-        fadeOut ? "opacity-0" : "opacity-100"
-      }`}
-      style={{ backgroundColor: "#22c55e" }} 
+      className={`fixed inset-0 flex flex-col items-center justify-center z-50 transition-opacity duration-500 ${fadeOut ? "opacity-0" : "opacity-100"
+        }`}
+      style={{ backgroundColor: "#22c55e" }}
     >
       <h1 className="text-white text-3xl font-bold mb-8">
         Loading... Making you a great meal plan!

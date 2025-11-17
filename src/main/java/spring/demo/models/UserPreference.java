@@ -23,6 +23,7 @@ public class UserPreference {
 	private int meals;
 	private boolean vegan;
 	private String allergies;
+    private boolean update;
 
 	
 	public int getCalories() {
@@ -55,6 +56,11 @@ public class UserPreference {
 	public void setAllergies(String allergies) {
 		this.allergies = allergies;
 	}
+
+    public boolean isUpdate(){
+        return update;
+    }
+
 
 	
 	

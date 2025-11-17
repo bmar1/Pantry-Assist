@@ -17,6 +17,7 @@ release.properties
 .idea/
 *.iml
 .vscode/
+.mvn/
 .project
 .classpath
 .settings/
@@ -49,10 +50,6 @@ application-prod.properties
 *.swo
 *.orig
 
-# ==========================
-# ✅ Optional: Node/Frontend
-# (if frontend lives in same repo)
-# ==========================
 node_modules/
 build/
 dist/

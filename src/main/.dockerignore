@@ -1,0 +1,6 @@
+target/
+application.properties
+walmart_private_key.pem
+.env
+*.log
+.git
