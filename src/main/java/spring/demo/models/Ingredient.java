@@ -21,29 +21,26 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Ingredient {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-
-	@Column(nullable = false, unique = true)
-	private String name;
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(nullable = false, unique = true)
+    private String name;
     @Column(nullable = true)
-	private Double calories;
+    private Double calories;
     @Column(nullable = true)
-	private Double protein;
+    private Double protein;
     private String category;
     @Column(nullable = true)
-	private Double carbs;
+    private Double carbs;
     @Column(nullable = true)
-	private Double fat;
-	private String productUrl;
+    private Double fat;
+    private String productUrl;
     private String imageUrl;
-	
-	private Double totalPrice;
-	//how many in box
-	private String servingSize;
 
+    private Double totalPrice;
+    //how many in box
+    private String servingSize;
     private String servingsPerContainer; //servings in container
 
     @Column(name = "created_at")
@@ -55,6 +52,7 @@ public class Ingredient {
     @Column(name = "cache_expires_at")
     private LocalDateTime cacheExpiresAt;
 
+    //Save and update before persisting
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -68,75 +66,55 @@ public class Ingredient {
         cacheExpiresAt = LocalDateTime.now().plusDays(14); // Reset TTL on update
     }
 
-    /**
-     * Check if this ingredient's cached data is still valid
-     */
     public boolean isCacheValid() {
         return cacheExpiresAt != null && LocalDateTime.now().isBefore(cacheExpiresAt);
     }
 
-    
     public double getTotalPrice() {
-		return totalPrice;
-	}
-
+        return totalPrice;
+    }
 
     // Per 100g serving
-	private String servingDescription;
+    private String servingDescription;
 
     public Ingredient(String name) {
-		this.name = name;
-	}
+        this.name = name;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Long getId() {
+        return id;
+    }
 
     public String getName() {
-		return name;
-	}
-
+        return name;
+    }
 
     public String getServingSize() {
-		return servingSize;
-	}
-
-
+        return servingSize;
+    }
 
     public Double getCalories() {
-		return calories;
-	}
+        return calories;
+    }
 
     public Double getProtein() {
-		return protein;
-	}
+        return protein;
+    }
 
     public Double getCarbs() {
-		return carbs;
-	}
+        return carbs;
+    }
 
     public Double getFat() {
-		return fat;
-	}
+        return fat;
+    }
 
     public String getServingDescription() {
-		return servingDescription;
-	}
-
+        return servingDescription;
+    }
 
     public String getProductUrl() {
         return productUrl;
     }
 
-    public void setProductUrl(String url){
-        this.productUrl = url;
-    }
-
-    public void setImageUrl(String url){
-        this.imageUrl = url;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
 }

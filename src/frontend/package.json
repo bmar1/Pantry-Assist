@@ -1,5 +1,6 @@
 {
-  "name": "frontend",
+  "name": "Pantry Assist Frontend",
+  "author": "Bilal Umar",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

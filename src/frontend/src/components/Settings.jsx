@@ -4,11 +4,11 @@
  * their account. It provides options to edit user preferences, change the theme,
  * and delete their account.
  */
- 
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useDarkMode } from "./DarkModeContext";
+import { useDarkMode } from "../contexts/DarkModeContext";
 
 export default function Settings({ setShowSettings, setShowPreferences }) {
   const navigate = useNavigate();

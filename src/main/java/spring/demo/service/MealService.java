@@ -22,7 +22,6 @@ public class MealService {
         this.webClient = builder.baseUrl("https://www.themealdb.com/api/json/v1/1").build();
     }
 
-    // Get a random recipe
     public Recipe getRandomMeal() throws Exception {
         String response = webClient.get()
                 .uri("/random.php")
@@ -33,7 +32,6 @@ public class MealService {
         return parseRecipeFromJson(response);
     }
 
-    // Get recipe by name
     public Recipe getMealByName(String name) throws Exception {
         String response = webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/search.php").queryParam("s", name).build())
@@ -44,7 +42,6 @@ public class MealService {
         return parseRecipeFromJson(response);
     }
 
-    // Filter by main ingredient (returns first recipe for simplicity)
     public ArrayList<Recipe> getMealsByIngredient(String ingredient) throws Exception {
         String response = webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/filter.php").queryParam("i", ingredient).build())
@@ -66,9 +63,9 @@ public class MealService {
             }
         }
 
-        return recipes; // returns empty list if no matching meals
+        return recipes;
     }
-    
+
     public ArrayList<Recipe> getMealsByCategory(String category) throws Exception {
         String response = webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/filter.php").queryParam("c", category).build())
@@ -90,10 +87,9 @@ public class MealService {
             }
         }
 
-        return recipes; // returns empty list if no matching meals
+        return recipes;
     }
-    
-    // Helper: get full recipe by ID
+
     public Recipe getMealById(String id) throws Exception {
         Thread.sleep(50);
         String response = webClient.get()

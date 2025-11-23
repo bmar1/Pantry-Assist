@@ -9,15 +9,16 @@
 
 import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from "react";
-import OnboardingCard from "./templates/OnboardCard";
-import Settings from "./templates/settings";
-import SettingsOnboard from "./templates/SettingsOnboard";
-import Nav from "./templates/navbar";
+import OnboardingCard from "../components/OnboardCard";
+import Settings from "../components/Settings";
+import SettingsOnboard from "../components/SettingsOnboard";
+import Nav from "../components/Navbar";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [showOnboarding, setShowOnboarding] = useState(
-    () => localStorage.getItem("onboarding") === "true"
+    () =>
+      localStorage.getItem("onboarding") === "true"
   );
 
   const [isNavVisible, setIsNavVisible] = useState(false);
@@ -60,7 +61,7 @@ export default function Dashboard() {
     console.log(localStorage.getItem("token"));
     const count = 3;
     try {
-      const response = await fetch(`http://localhost:8080/api/selectMeals?count=${count}`, {
+      const response = await fetch(`http://localhost:8080/api/selectMeals`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -157,7 +158,6 @@ export default function Dashboard() {
         <div className="flex flex-col md:flex-row gap-10 md:gap-20 mt-5 ml-5">
           {/* Render meal suggestions based on data, rendered conditionally*/}
           <div
-            onClick={() => handleRecipeClick(meals[currentIndex].name)}
             className="bg-[#fdfcf5] p-8 rounded-xl shadow-lg hover:shadow-2xl h-[600px] flex flex-col w-full md:w-3/5 md:mr-16"
           >
 
@@ -171,6 +171,7 @@ export default function Dashboard() {
                 <div className="flex-grow flex flex-col justify-center gap-4 ml-4">
                   <div className="w-[95%] h-80 rounded-2xl overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
                     <img
+                      onClick={() => handleRecipeClick(meals[currentIndex].name)}
                       src={meals[currentIndex].thumbnail}
                       alt={meals[currentIndex].name}
                       className="w-full h-full object-cover object-center"
@@ -256,5 +257,6 @@ export default function Dashboard() {
     </div>
   );
 }
+
 
 

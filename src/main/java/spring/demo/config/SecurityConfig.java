@@ -1,8 +1,7 @@
 /*
- * This class aims to create a global config to secure our server by only allowing endpoints, 
+ * This class aims to create a global config to secure our server by only allowing endpoints,
  * the rest of which utilizes the filter and authentication provider to authenticate users
  */
-
 
 
 package spring.demo.config;
@@ -31,13 +30,12 @@ import java.util.List;
 @EnableMethodSecurity
 @Configuration
 public class SecurityConfig {
-	
-	private final JwtAuthFilter jwtAuthFilter;
-	private final AuthenticationProvider authenticationProvider;
 
+    private final JwtAuthFilter jwtAuthFilter;
+    private final AuthenticationProvider authenticationProvider;
 
-    //Configure http reequests to allow local origin, authenticating everything besides login pages
-	@Bean
+    //Configure http requests to allow local origin, authenticating everything besides login pages
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
@@ -71,7 +69,7 @@ public class SecurityConfig {
         configuration.addAllowedMethod("*");
         configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

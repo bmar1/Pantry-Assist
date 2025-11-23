@@ -1,7 +1,7 @@
-package spring.demo.models; // adjust package as needed
+package spring.demo.models;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
+
 
 @Entity
 @Table(name = "user_meal_plans")
@@ -16,16 +16,16 @@ public class UserMealPlan {
     private User user;
 
     @Column(name = "eaten")
-    private Boolean eaten;
+    private Boolean eaten = false;
     @Column(name = "planned")
-    private Boolean planned;
+    private Boolean planned = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = false)
     private Recipe recipe;
 
-    // Constructors
-    public UserMealPlan() {}
+    public UserMealPlan() {
+    }
 
     public UserMealPlan(User user, Recipe recipe) {
         this.user = user;
@@ -72,5 +72,6 @@ public class UserMealPlan {
     public void setRecipe(Recipe recipe) {
         this.recipe = recipe;
     }
+
 
 }

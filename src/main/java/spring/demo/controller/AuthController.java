@@ -1,9 +1,9 @@
+/*
+This class covers authorization and authentication of a user, as well as basic crud on a high level, this is further filtering AFTER JWT filtering.
+ */
+
 package spring.demo.controller;
 
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,13 +11,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import ch.qos.logback.core.net.SyslogOutputStream;
 import lombok.RequiredArgsConstructor;
 import spring.demo.config.security.JwtService;
 import spring.demo.models.*;
+import spring.demo.models.repository.UserRepository;
 
 
 @RestController
@@ -49,8 +48,6 @@ public class AuthController {
 		return ResponseEntity.ok(new AuthResponse(token));
 	}
 
-
-
 	@PostMapping("/login")
 	public ResponseEntity<AuthResponse> login(@RequestBody AuthenticationRequest request) {
 
@@ -66,6 +63,17 @@ public class AuthController {
 
 	}
 
+	//Refreshes a USER's jwt token
+	@GetMapping("/refresh")
+	public ResponseEntity<AuthResponse> login(@AuthenticationPrincipal UserDetails userDetails) {
+
+		User user = userRepository.findByEmail(userDetails.getUsername())
+				.orElseThrow(() -> new UsernameNotFoundException("User not found!"));
+
+		String token = jwtService.generateToken(user);
+		return ResponseEntity.ok(new AuthResponse(token));
+
+	}
 
     @DeleteMapping("/delete")
     public ResponseEntity<String> delete(@AuthenticationPrincipal UserDetails userDetails){
@@ -74,7 +82,6 @@ public class AuthController {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found!"));
 
         userRepository.delete(user);
-
 
         if(!userRepository.existsByEmail(email)){
             return ResponseEntity.ok("Account deleted");

@@ -2,46 +2,136 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 const RecipePage = () => {
 
     const location = useLocation();
     const { name } = location.state || {}
     const [recipe, setRecipe] = useState(null);
-
-    useEffect(() => {
-        if (name) {
-            loadMeal();
-        }
-    }, [name]);
+    const [loading, setLoading] = useState(true);
+    const [stepCompleted, setStepCompleted] = useState([]);
+    const [showPopup, setShowPopup] = useState(false);
+    const [mealEaten, setMealEaten] = useState(false);
 
 
-    const loadMeal = async () => {
+
+    const markMealAsEaten = async () => {
         try {
-            // Encode the meal name to handle spaces and special characters
-            const encodedName = encodeURIComponent(name);
+            const token = localStorage.getItem("token");
 
-            const response = await fetch(`http://localhost:8080/api/meal?name=${encodedName}`, {
-                method: "GET",
+            console.log("Marking meal as eaten:", name);
+            console.log("Token exists:", !!token);
+
+            const url = `http://localhost:8080/api/meal/updateMeal?name=${encodeURIComponent(name)}`;
+            console.log("Request URL:", url);
+
+            const response = await fetch(url, {
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    "Authorization": `Bearer ${token}`,
                 },
             });
 
+
             if (response.ok) {
-                const data = await response.json();
-                // The API might return an array with a single recipe object
-                setRecipe(Array.isArray(data) ? data[0] : data);
+                console.log(`Meal '${name}' marked as eaten.`);
             } else {
-                console.error("Failed to load meal:", response.status);
+                console.error("Failed to mark meal as eaten:", response.status);
             }
         } catch (error) {
-            console.error("Error loading meal:", error);
+            console.error("Error marking meal as eaten:", error);
         }
     };
+
+    useEffect(() => {
+        const loadMeal = async () => {
+            if (!name) {
+                setLoading(false);
+                return;
+            }
+            try {
+                setLoading(true);
+                const encodedName = encodeURIComponent(name);
+                const response = await fetch(`http://localhost:8080/api/meal?name=${encodedName}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setRecipe(Array.isArray(data) ? data[0] : data);
+                } else {
+                    console.error("Failed to load meal:", response.status);
+                    setRecipe(null);
+                }
+            } catch (error) {
+                console.error("Error loading meal:", error);
+                setRecipe(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadMeal();
+    }, [name]);
+
+    const steps = useMemo(() => {
+        if (!recipe?.instructions) return [];
+        return recipe.instructions
+            .replace(/\\r\\n/g, '\n')
+            .replace(/\\n/g, '\n')
+            .split(/\n+/)
+            .filter(step => step.trim() !== '');
+    }, [recipe?.instructions]);
+
+    // Initialize stepCompleted only when steps change
+    useEffect(() => {
+        if (steps && steps.length > 0) {
+            setStepCompleted(new Array(steps.length).fill(false));
+        }
+    }, [steps]);
+
+    // Check if all steps are completed
+    useEffect(() => {
+        // Only run if we have steps and stepCompleted is initialized
+        if (stepCompleted.length > 0 && steps.length > 0) {
+            const allCompleted = stepCompleted.every(Boolean);
+
+            if (allCompleted && !mealEaten) { // Only trigger if not already eaten
+                setShowPopup(true);
+                setMealEaten(true);
+
+                const timer = setTimeout(() => {
+                    setShowPopup(false);
+                }, 4000);
+
+                // Cleanup timeout if component unmounts
+                return () => clearTimeout(timer);
+            }
+        }
+    }, [stepCompleted, steps.length, mealEaten]);
+
+    // Call API when meal is marked as eaten
+    useEffect(() => {
+        const markMeal = async () => {
+            if (mealEaten && name) {
+                try {
+                    await markMealAsEaten();
+                } catch (error) {
+                    console.error("Failed to mark meal as eaten:", error);
+                    // Optionally reset mealEaten on error
+                    // setMealEaten(false);
+                }
+            }
+        };
+
+        markMeal();
+    }, [mealEaten, name]);
 
     console.log("Full recipe object:", recipe);
     console.log("Name: ", name)
@@ -49,6 +139,27 @@ const RecipePage = () => {
     console.log("Type of ingredients:", typeof recipe?.ingredients);
 
     const navigate = useNavigate();
+
+    // Convert YouTube URL to embed format
+    const getYouTubeEmbedUrl = (url) => {
+        if (!url) return null;
+        const videoId = url.split('v=')[1];
+        const ampersandPosition = videoId?.indexOf('&');
+        if (ampersandPosition !== -1) {
+            return `https://www.youtube.com/embed/${videoId.substring(0, ampersandPosition)}`;
+        }
+        return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+    };
+
+    const embedUrl = getYouTubeEmbedUrl(recipe?.youtube);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-[#3f783f] flex justify-center items-center">
+                <p className="text-white text-xl">Loading...</p>
+            </div>
+        );
+    }
 
     if (!recipe) {
         return (
@@ -66,28 +177,7 @@ const RecipePage = () => {
         );
     }
 
-    // Convert YouTube URL to embed format
-    const getYouTubeEmbedUrl = (url) => {
-        if (!url) return null;
-        const videoId = url.split('v=')[1];
-        const ampersandPosition = videoId?.indexOf('&');
-        if (ampersandPosition !== -1) {
-            return `https://www.youtube.com/embed/${videoId.substring(0, ampersandPosition)}`;
-        }
-        return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
-    };
-
-    const embedUrl = getYouTubeEmbedUrl(recipe.youtube);
-
-    // Split instructions by line breaks
-    const steps = recipe.instructions
-        ? recipe.instructions
-            // Convert literal "\r\n" or "\n" into real newlines first
-            .replace(/\\r\\n/g, '\n')
-            .replace(/\\n/g, '\n')
-            .split(/\n+/)
-            .filter(step => step.trim() !== '')
-        : [];
+    // markMealAsEaten should be stable or memoized
 
 
     console.log(steps);
@@ -95,6 +185,11 @@ const RecipePage = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-[#6d9851] to-[#5A7A4D] dark:bg-black flex justify-center items-start p-6">
+            {showPopup && (
+                <div className="fixed bottom-5 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+                    <p>Congratulations on your meal!</p>
+                </div>
+            )}
             <div className="max-w-4xl w-full bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
                 {/* Back Button */}
                 <div className="p-6">
@@ -186,9 +281,25 @@ const RecipePage = () => {
                             <h2 className="text-2xl font-semibold mb-3 text-[#5C7A62] dark:text-gray-200">Instructions</h2>
                             <ol className="space-y-4">
                                 {steps.map((step, index) => (
-                                    <li key={index} className="flex items-start">
-                                        <span className="flex-shrink-0 w-8 h-8 bg-[#7A9E7E] text-white font-bold rounded-full flex items-center justify-center mr-4">{index + 1}</span>
-                                        <span className="text-gray-700 dark:text-gray-300">{step}</span>
+                                    <li
+                                        key={index}
+                                        className={`flex items-center p-4 rounded-lg cursor-pointer transition-colors ${stepCompleted[index] ? 'bg-green-500 text-white' : 'bg-gray-100 dark:bg-gray-700'
+                                            }`}
+                                        onClick={() => {
+                                            const newStepCompleted = [...stepCompleted];
+                                            newStepCompleted[index] = !newStepCompleted[index];
+                                            setStepCompleted(newStepCompleted);
+                                        }}
+                                    >
+                                        <div
+                                            className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mr-4 font-bold ${stepCompleted[index]
+                                                ? 'bg-white text-green-500'
+                                                : 'bg-[#7A9E7E] text-white'
+                                                }`}
+                                        >
+                                            {index + 1}
+                                        </div>
+                                        <div className="text-gray-700 dark:text-gray-300">{step}</div>
                                     </li>
                                 ))}
                             </ol>

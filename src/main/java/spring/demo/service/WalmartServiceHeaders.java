@@ -15,27 +15,21 @@ import java.util.Base64;
 public class WalmartServiceHeaders {
     private final String keyVersion = "1";
 
-
     @Value("${walmart.id}")
     private String consumerId;
 
-
-    // 1. Consumer ID
     public String getWMConsumerId() {
         return consumerId;
     }
 
-    // 2. Key version
     public String getWMSecKeyVersion() {
         return keyVersion;
     }
 
-    // 3. Timestamp (milliseconds)
     public String getWMConsumerIntimestamp() {
         return String.valueOf(System.currentTimeMillis());
     }
 
-    // 4. Auth signature
     public String getWMSecAuthSignature(String timestamp) throws Exception {
         String stringToSign = consumerId + "\n" + timestamp + "\n" + keyVersion + "\n";
 
@@ -48,7 +42,6 @@ public class WalmartServiceHeaders {
 
         return Base64.getEncoder().encodeToString(signedBytes);
     }
-
 
     @Value("classpath:walmart_private_key.pem")
     private Resource privateKeyResource;

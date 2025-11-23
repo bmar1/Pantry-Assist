@@ -1,4 +1,4 @@
-package spring.demo.models;
+package spring.demo.models.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import spring.demo.models.Ingredient;

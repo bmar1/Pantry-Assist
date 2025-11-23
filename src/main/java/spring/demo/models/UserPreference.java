@@ -24,8 +24,6 @@ public class UserPreference {
 	private boolean vegan;
 	private String allergies;
     private boolean update;
-
-	
 	public int getCalories() {
 		return calories;
 	}

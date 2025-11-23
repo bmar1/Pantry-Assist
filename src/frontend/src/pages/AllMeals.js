@@ -7,10 +7,10 @@
 
 import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from "react";
-import Nav from "./templates/navbar";
-import './allMeals.css';
-import Settings from "./templates/settings";
-import SettingsOnboard from "./templates/SettingsOnboard"
+import Nav from "../components/Navbar";
+import '../styles/allMeals.css';
+import Settings from "../components/Settings";
+import SettingsOnboard from "../components/SettingsOnboard"
 
 export default function AllMeals() {
     const navigate = useNavigate();

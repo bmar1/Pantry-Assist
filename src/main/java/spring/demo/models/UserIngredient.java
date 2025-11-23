@@ -1,4 +1,4 @@
-package spring.demo.models; // adjust package as needed
+package spring.demo.models; // ties an ingredient to user meal plan (grocery list)
 
 import jakarta.persistence.*;
 
@@ -20,8 +20,9 @@ public class UserIngredient {
 
     private Boolean purchased; // Track if they bought it
 
-    // Constructors
-    public UserIngredient() {}
+
+    public UserIngredient() {
+    }
 
     public UserIngredient(User user, Ingredient ingredient) {
         this.user = user;
@@ -30,7 +31,6 @@ public class UserIngredient {
         this.purchased = false;
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }

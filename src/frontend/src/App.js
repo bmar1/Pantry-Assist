@@ -1,12 +1,12 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Dashboard from "./Dashboard";
-import Login from "./Login"; // your login component
-import LoadingScreen from "./LoadingScreen";
-import RecipePage from "./recipePage";
-import GroceryListPage from "./groceryPage";
-import LandingPage from "./Landing";
-import AllMeals from "./allMeals";
-import { DarkModeProvider } from "./templates/DarkModeContext";
+import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+import LoadingScreen from "./pages/LoadingScreen";
+import RecipePage from "./pages/RecipePage";
+import GroceryListPage from "./pages/GroceryPage";
+import LandingPage from "./pages/Landing";
+import AllMeals from "./pages/AllMeals";
+import { DarkModeProvider } from "./contexts/DarkModeContext";
 
 function App() {
   return (

@@ -1,3 +1,7 @@
+/*
+This API service is deprecated, as nutritionix's free API tier is no longer supported.
+ */
+
 package spring.demo.service;
 
 import java.nio.charset.StandardCharsets;

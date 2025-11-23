@@ -22,22 +22,15 @@ public class PriceService {
     private final ObjectMapper mapper = new ObjectMapper();
     private static final Logger log = LoggerFactory.getLogger(PriceService.class);
 
-
-
     @Autowired
     private WalmartServiceHeaders serviceHeader;
-
 
     public PriceService(WebClient.Builder builder) {
         this.webClient = builder.baseUrl("https://developer.api.walmart.com/").build();
     }
 
     public Ingredient getIngredient(String ing) throws Exception {
-
-
         String timestamp = serviceHeader.getWMConsumerIntimestamp();
-
-
         String searchResponse = String.valueOf(webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/api-proxy/service/affil/product/v2/search")
@@ -78,18 +71,15 @@ public class PriceService {
         }
 
 
-
         return parseResponse(searchResponse, ing);
 
     }
 
 
-
-
     public Ingredient parseResponse(String jsonResponse, String ing)
             throws IOException, JsonProcessingException {
 
-        //Map the response to find the closest ingredient and its price, url link, totalServings in box etc
+        //Map the response to find the cheapest ingredient
         JsonNode root = mapper.readTree(jsonResponse);
 
         if (root.has("errors")) {
@@ -114,23 +104,58 @@ public class PriceService {
             return null;
         }
 
-        JsonNode first = items.get(0);
-        System.out.println(first.toPrettyString());
+        JsonNode cheapestItem = null;
+        double lowestPrice = Double.MAX_VALUE;
+
+        log.info("Searching for cheapest '{}' from {} available items", ing, items.size());
+
+        for (JsonNode item : items) {
+            String itemName = item.path("name").asText("");
+            double currentPrice = item.path("salePrice").asDouble(Double.MAX_VALUE);
+            String size = item.path("size").asText("");
+
+            log.debug("Evaluating: {} - Price: ${} - Size: {}", itemName, currentPrice, size);
+
+            // Skip items with invalid prices (0 or missing)
+            if (currentPrice <= 0 || currentPrice == Double.MAX_VALUE) {
+                log.debug("Skipping {} - invalid price", itemName);
+                continue;
+            }
+
+            if (currentPrice > 20.0) {
+                log.debug("Skipping {} - too expensive: ${}", itemName, currentPrice);
+                continue;
+            }
+
+
+            if (currentPrice < lowestPrice) {
+                log.info("New cheapest option: {} at ${} (previous: ${})",
+                        itemName, currentPrice, lowestPrice == Double.MAX_VALUE ? "none" : lowestPrice);
+                lowestPrice = currentPrice;
+                cheapestItem = item;
+            }
+        }
+
+        if (cheapestItem != null) {
+            log.info("SELECTED for '{}': {} at ${}",
+                    ing, cheapestItem.path("name").asText(), lowestPrice);
+        }
+
+
+        if (cheapestItem == null) {
+            log.warn("No valid priced items found for ingredient '{}' after filtering", ing);
+            return null;
+        }
+
         Ingredient ingredient = new Ingredient();
 
-
-        System.out.println(first);
-
-        ingredient.setName(first.path("name").asText(null));
-        ingredient.setTotalPrice(first.path("salePrice").asDouble(0.0));
-        ingredient.setProductUrl(first.path("affiliateAddToCartUrl").asText(null));
-        ingredient.setImageUrl(first.path("largeImage").asText(null));
-        ingredient.setCategory(first.path("categoryPath").asText(null));
-        ingredient.setServingsPerContainer(first.path("size").asText("0"));
+        ingredient.setName(cheapestItem.path("name").asText(null));
+        ingredient.setTotalPrice(cheapestItem.path("salePrice").asDouble(0.0));
+        ingredient.setProductUrl(cheapestItem.path("affiliateAddToCartUrl").asText(null));
+        ingredient.setImageUrl(cheapestItem.path("largeImage").asText(null));
+        ingredient.setCategory(cheapestItem.path("categoryPath").asText(null));
+        ingredient.setServingsPerContainer(cheapestItem.path("size").asText("0"));
         ingredient.setServingSize(String.valueOf(1));
-
-
-
 
         return ingredient;
     }
