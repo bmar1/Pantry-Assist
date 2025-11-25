@@ -104,7 +104,7 @@ public class MainController {
     }
 
 
-    @PostMapping("/updatePref")
+    @PostMapping("/user/updatePref")
     public ResponseEntity<?> updatePref(@RequestBody UserPreference pref, @AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
         String email = userDetails.getUsername();
         if (email == null) {
@@ -121,7 +121,7 @@ public class MainController {
     }
 
     //Updates a specific meal to mark as eaten given a meal
-    @PutMapping("/meal/updateMeal")
+    @PutMapping("/meals/updateMeal")
     @Transactional
     public ResponseEntity<?> updateMeal(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -169,7 +169,7 @@ public class MainController {
     }
 
     //Returns all user meals by fetching from DB, accepting a number of meals to return as well
-    @GetMapping("/allMeals")
+    @GetMapping("/meals/allMeals")
     @Transactional
     public ResponseEntity<List<Recipe>> meals(@AuthenticationPrincipal UserDetails userDetails, @RequestParam(required = false) Integer numIngredients) {
         String email = userDetails.getUsername();
@@ -219,7 +219,7 @@ public class MainController {
 
     //Return a random recipe from DB
     @Transactional
-    @GetMapping("/random")
+    @GetMapping("/meals/random")
     public ResponseEntity<List<Recipe>> random(@AuthenticationPrincipal UserDetails userDetails) {
         String email = userDetails.getUsername();
 
@@ -232,7 +232,7 @@ public class MainController {
         return ResponseEntity.ok(subList);
     }
 
-    @GetMapping("/selectMeals")
+    @GetMapping("/meals/selectMeals")
     @Transactional
     public ResponseEntity<List<Recipe>> selectMeals(@AuthenticationPrincipal UserDetails userDetails) {
         String email = userDetails.getUsername();
@@ -347,7 +347,7 @@ public class MainController {
     }
 
     //Returns the users grocery list by items found in the recipe list
-    @GetMapping("/grocery")
+    @GetMapping("/meals/grocery")
     public ResponseEntity<List<Ingredient>> list(@AuthenticationPrincipal UserDetails userDetails) {
         String email = userDetails.getUsername();
 

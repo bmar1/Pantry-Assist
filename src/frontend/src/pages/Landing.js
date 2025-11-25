@@ -22,21 +22,27 @@ export default function Landing() {
         <div className="flex flex-col min-h-screen bg-[#f7f5f0] dark:bg-black">
             {/* Navigation Bar */}
             <nav className="bg-gradient-to-b from-[#618c45] to-[#5A7A4D] shadow-md px-8 py-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-6">
                     <img src="/favicon.png" className="w-auto h-14 mr-2 pr-2" alt="Logo" />
-                    <h2 className="text-white text-xl font-semibold">Pantry Assist - Track your meals, fuel your life</h2>
+                    <h2 className="text-white text-xl font-semibold">Pantry Assist</h2>
+                    <button
+                        onClick={() => navigate("/About")}
+                        className="bg-[#ffffff] text-[#5A7A4D] hover:bg-[#cedfc2] px-6 py-2 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
+                    >
+                        About Us
+                    </button>
                 </div>
 
                 <div className="flex items-center gap-6">
                     <button
                         onClick={handleNavigation}
-                        className="bg-[#ffffff] text-[#5A7A4D] hover:bg-[#cedfc2] px-6 py-2 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md transition-delay-100"
+                        className="bg-[#ffffff] text-[#5A7A4D] hover:bg-[#cedfc2] px-6 py-2 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
                     >
                         Login
                     </button>
                     <button
                         onClick={handleNavigation}
-                        className="bg-[#ffffff] text-[#5A7A4D] hover:bg-[#cedfc2] px-6 py-2 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md transition-delay-100"
+                        className="bg-[#ffffff] text-[#5A7A4D] hover:bg-[#cedfc2] px-6 py-2 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
                     >
                         Build Plan
                     </button>
@@ -157,8 +163,6 @@ export default function Landing() {
 
 
             <div className="w-full h-10 shadow-[0_-25px_40px_-20px_rgba(0,0,0,0.35)]" />
-
-
 
             {/* ——— Mid-page CTA ——— */}
             <div className="py-20 relative text-center bg-gradient-to-t from-[#f9fbf7] to-[#f0f5ea] dark:from-[#0a0a0a] dark:to-black">
@@ -286,7 +290,7 @@ export default function Landing() {
                         <div>
                             <h4 className="font-semibold mb-3">Company</h4>
                             <ul className="space-y-2 text-sm">
-                                <li><a href="#" className="text-gray-200 hover:text-white transition-colors">About Us</a></li>
+                                <li><a href="/About" className="text-gray-200 hover:text-white transition-colors">About Us</a></li>
                                 <li><a href="#" className="text-gray-200 hover:text-white transition-colors">Careers</a></li>
                                 <li><a href="#" className="text-gray-200 hover:text-white transition-colors">Blog</a></li>
                                 <li><a href="#" className="text-gray-200 hover:text-white transition-colors">Contact</a></li>

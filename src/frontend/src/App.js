@@ -6,6 +6,7 @@ import RecipePage from "./pages/RecipePage";
 import GroceryListPage from "./pages/GroceryPage";
 import LandingPage from "./pages/Landing";
 import AllMeals from "./pages/AllMeals";
+import About from "./pages/About";
 import { DarkModeProvider } from "./contexts/DarkModeContext";
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="/grocery" element={<GroceryListPage />} />
           <Route path="/landing" element={<LandingPage />} />
           <Route path="/all-meals" element={<AllMeals />} />
+          <Route path="/about" element={<About />} />
         </Routes>
       </Router>
     </DarkModeProvider>

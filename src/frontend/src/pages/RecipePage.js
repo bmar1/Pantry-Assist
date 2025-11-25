@@ -23,7 +23,7 @@ const RecipePage = () => {
             console.log("Marking meal as eaten:", name);
             console.log("Token exists:", !!token);
 
-            const url = `http://localhost:8080/api/meal/updateMeal?name=${encodeURIComponent(name)}`;
+            const url = `http://localhost:8080/api/meals/updateMeal?name=${encodeURIComponent(name)}`;
             console.log("Request URL:", url);
 
             const response = await fetch(url, {

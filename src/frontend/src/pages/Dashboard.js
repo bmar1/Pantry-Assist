@@ -61,7 +61,7 @@ export default function Dashboard() {
     console.log(localStorage.getItem("token"));
     const count = 3;
     try {
-      const response = await fetch(`http://localhost:8080/api/selectMeals`, {
+      const response = await fetch(`http://localhost:8080/api/meals/selectMeals`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export default function Dashboard() {
 
   const loadPreview = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/random", {
+      const response = await fetch("http://localhost:8080/api/meals/random", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -114,7 +114,7 @@ export default function Dashboard() {
   const loadGrocery = async () => {
     setIsGroceryLoading(true);
     try {
-      const response = await fetch(`http://localhost:8080/api/grocery`, {
+      const response = await fetch(`http://localhost:8080/api/meals/grocery`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

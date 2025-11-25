@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 const GroceryListPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    
+
     // Initialize state directly from location, or as an empty array.
     const [groceryList, setGroceryList] = useState(() => location.state?.grocery || []);
     const [isLoading, setIsLoading] = useState(() => !location.state?.grocery);
@@ -14,7 +14,7 @@ const GroceryListPage = () => {
     useEffect(() => {
         const loadGrocery = async () => {
             try {
-                const response = await fetch(`http://localhost:8080/api/grocery`, {
+                const response = await fetch(`http://localhost:8080/api/meals/grocery`, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
