@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from 'framer-motion';
 
 export default function Landing() {
+    const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const navigate = useNavigate();
 
     // Navigates the user to the login page.
@@ -21,33 +22,73 @@ export default function Landing() {
     return (
         <div className="flex flex-col min-h-screen bg-[#f7f5f0] dark:bg-black">
             {/* Navigation Bar */}
-            <nav className="bg-gradient-to-b from-[#618c45] to-[#5A7A4D] shadow-md px-8 py-4 flex items-center justify-between">
+            <nav className="bg-gradient-to-b from-[#618c45] to-[#5A7A4D] shadow-md px-4 sm:px-8 py-4 flex items-center justify-between">
+                {/* Left Side Group */}
                 <div className="flex items-center gap-6">
-                    <img src="/favicon.png" className="w-auto h-14 mr-2 pr-2" alt="Logo" />
-                    <h2 className="text-white text-xl font-semibold">Pantry Assist</h2>
+
+                    <div className="flex items-center gap-2">
+                        <img src="/favicon.png" className="w-auto h-12 sm:h-14" alt="Logo" />
+                        <h2 className="text-white text-lg sm:text-xl font-semibold">Pantry Assist</h2>
+                    </div>
                     <button
                         onClick={() => navigate("/About")}
-                        className="bg-[#ffffff] text-[#5A7A4D] hover:bg-[#cedfc2] px-6 py-2 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
+                        className="bg-[#ffffff] text-[#5A7A4D] hover:bg-[#cedfc2] px-6 py-2 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md hidden md:block"
                     >
                         About Us
                     </button>
                 </div>
 
-                <div className="flex items-center gap-6">
+                {/* Right Side Group */}
+                <div className="flex items-center">
+                    {/* Desktop Links */}
+                    <div className="hidden md:flex items-center gap-6">
+                        <button
+                            onClick={handleNavigation}
+                            className="bg-[#8abeeb] text-[#2c51b8] hover:bg-[#92c8f8] px-6 py-2 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
+                        >
+                            Login
+                        </button>
+                        <button
+                            onClick={handleNavigation}
+                            className="bg-[#ffffff] text-[#5A7A4D] hover:bg-[#cedfc2] px-6 py-2 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
+                        >
+                            Build Plan
+                        </button>
+                    </div>
+                    {/* Mobile Hamburger */}
+                    <div className="md:hidden">
+                        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white focus:outline-none">
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+
+            {/* Mobile Menu */}
+            {isMenuOpen && (
+                <div className="md:hidden bg-[#5A7A4D] text-center py-4">
                     <button
-                        onClick={handleNavigation}
-                        className="bg-[#ffffff] text-[#5A7A4D] hover:bg-[#cedfc2] px-6 py-2 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
+                        onClick={() => { navigate("/About"); setIsMenuOpen(false); }}
+                        className="block w-full py-2 text-white hover:bg-[#446437]"
+                    >
+                        About Us
+                    </button>
+                    <button
+                        onClick={() => { handleNavigation(); setIsMenuOpen(false); }}
+                        className="block w-full py-2 text-white hover:bg-[#446437]"
                     >
                         Login
                     </button>
                     <button
-                        onClick={handleNavigation}
-                        className="bg-[#ffffff] text-[#5A7A4D] hover:bg-[#cedfc2] px-6 py-2 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
+                        onClick={() => { handleNavigation(); setIsMenuOpen(false); }}
+                        className="block w-full py-2 text-white hover:bg-[#446437]"
                     >
                         Build Plan
                     </button>
                 </div>
-            </nav>
+            )}
 
             {/* Hero Section */}
             <div className="flex items-center justify-center min-h-[90vh] px-4">
@@ -89,7 +130,7 @@ export default function Landing() {
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.5, delay: 0.6 }}
                             onClick={handleNavigation}
-                            className="bg-[#5A7A4D] hover:bg-[#446437] w-[220px] md:w-[250px] text-white px-10 py-4 rounded-lg font-semibold text-xl md:text-2xl transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105"
+                            className="bg-[#819c57] hover:bg-[#94b264] w-[220px] md:w-[250px] text-white px-10 py-4 rounded-lg font-semibold text-xl md:text-2xl transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105"
                         >
                             Build Plan
                         </motion.button>
@@ -113,7 +154,7 @@ export default function Landing() {
             dark:bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05),transparent_70%)]
         " />
 
-                    <h1 className="text-[#bbc9aa] font-semibold text-5xl md:text-6xl text-center mb-12 relative z-10">
+                    <h1 className="text-black font-semibold text-5xl md:text-6xl text-center mb-12 relative z-10">
                         The Pantry
                     </h1>
 
@@ -182,7 +223,7 @@ export default function Landing() {
                     Build your personalized meal plan in under one minute.
                 </p>
 
-                <button className="px-10 py-4 bg-[#2c5e2] bg-[#5A7A4D] hover:bg-[#446437] w-[220px] md:w-[250px] text-white px-10 py-4 rounded-lg font-semibold text-xl md:text-2xl transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 transition relative z-10">
+                <button className="px-10 py-4 bg-[#2c5e2] bg-[#819c57] hover:bg-[#94b264] w-[220px] md:w-[250px] text-white px-10 py-4 rounded-lg font-semibold text-xl md:text-2xl transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 transition relative z-10">
                     Build My Plan
                 </button>
             </div>
