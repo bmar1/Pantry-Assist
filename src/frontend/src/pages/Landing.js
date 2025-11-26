@@ -42,12 +42,15 @@ export default function Landing() {
                 <div className="flex items-center">
                     {/* Desktop Links */}
                     <div className="hidden md:flex items-center gap-6">
-                        <button
+                        <motion.button
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.5, delay: 0.6 }}
                             onClick={handleNavigation}
-                            className="bg-[#8abeeb] text-[#2c51b8] hover:bg-[#92c8f8] px-6 py-2 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
+                            className="bg-[#8abeeb] hover:bg-[#92c8f8] text-white px-6 py-2 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md hidden md:block"
                         >
                             Login
-                        </button>
+                        </motion.button>
                         <button
                             onClick={handleNavigation}
                             className="bg-[#ffffff] text-[#5A7A4D] hover:bg-[#cedfc2] px-6 py-2 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
@@ -223,7 +226,7 @@ export default function Landing() {
                     Build your personalized meal plan in under one minute.
                 </p>
 
-                <button className="px-10 py-4 bg-[#2c5e2] bg-[#819c57] hover:bg-[#94b264] w-[220px] md:w-[250px] text-white px-10 py-4 rounded-lg font-semibold text-xl md:text-2xl transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 transition relative z-10">
+                <button onClick={handleNavigation} className="px-10 py-4 bg-[#2c5e2] bg-[#819c57] hover:bg-[#94b264] w-[220px] md:w-[250px] text-white px-10 py-4 rounded-lg font-semibold text-xl md:text-2xl transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105 transition relative z-10">
                     Build My Plan
                 </button>
             </div>
@@ -243,7 +246,7 @@ export default function Landing() {
         dark:bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06),transparent_75%)]
     " />
 
-                <h2 className="text-[#bbc9aa] font-semibold text-5xl md:text-6xl text-center mb-12 relative z-10">
+                <h2 className="text-black font-semibold text-5xl md:text-6xl text-center mb-12 relative z-10">
                     Popular Meal Plans
                 </h2>
 
