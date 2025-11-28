@@ -8,6 +8,7 @@ import LandingPage from "./pages/Landing";
 import AllMeals from "./pages/AllMeals";
 import About from "./pages/About";
 import { DarkModeProvider } from "./contexts/DarkModeContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -16,13 +17,48 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/landing" replace />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/LoadingScreen" element={<LoadingScreen />} />
-          <Route path="/recipe" element={<RecipePage />} />
-          <Route path="/grocery" element={<GroceryListPage />} />
           <Route path="/landing" element={<LandingPage />} />
-          <Route path="/all-meals" element={<AllMeals />} />
           <Route path="/about" element={<About />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/LoadingScreen"
+            element={
+              <ProtectedRoute>
+                <LoadingScreen />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/recipe"
+            element={
+              <ProtectedRoute>
+                <RecipePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/grocery"
+            element={
+              <ProtectedRoute>
+                <GroceryListPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/all-meals"
+            element={
+              <ProtectedRoute>
+                <AllMeals />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Router>
     </DarkModeProvider>

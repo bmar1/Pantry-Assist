@@ -1,15 +1,18 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 
 export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true); // state to switch between login/signup
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [accountError, setAccountError] = useState(false);
+
+  const message = location.state?.message;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,7 +75,7 @@ export default function AuthForm() {
           <h2 className="text-base sm:text-lg md:text-xl text-gray-700 text-center mb-6 sm:mb-8">
             {isLogin ? "Welcome back!" : "Create your account"}
           </h2>
-
+          {message && <p className="text-red-500 text-lg mb-2 text-center">{message}</p>}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-gray-800 font-semibold mb-2">Email Address</label>
@@ -94,11 +97,10 @@ export default function AuthForm() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition ${
-                    passwordError
-                      ? "border-red-500 focus:ring-red-500"
-                      : "border-gray-300 focus:ring-[#628d45]"
-                  }`}
+                  className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition ${passwordError
+                    ? "border-red-500 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-[#628d45]"
+                    }`}
                   placeholder="********"
                 />
                 {passwordError && (
