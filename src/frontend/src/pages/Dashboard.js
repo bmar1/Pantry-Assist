@@ -55,7 +55,6 @@ export default function Dashboard() {
   }, [grocery, shouldNavigate, navigate]);
 
   const loadDashboardData = async () => {
-    setIsLoading(true);
     try {
       const response = await fetch(`http://localhost:8080/api/dashboard/initial-data`, {
         method: "GET",
