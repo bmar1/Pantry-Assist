@@ -21,7 +21,7 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
-    @Value("${ENV_JWT_KEY}")
+    @Value("${JWT_KEY}")
     private String SECRET_KEY;
 	//Public functions to use during authentication/authorization, to find JWT information and sign
     public String extractUsername(String jwt) {

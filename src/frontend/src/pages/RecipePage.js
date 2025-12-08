@@ -20,9 +20,6 @@ const RecipePage = () => {
         try {
             const token = localStorage.getItem("token");
 
-            console.log("Marking meal as eaten:", name);
-            console.log("Token exists:", !!token);
-
             const url = `http://localhost:8080/api/meals/updateMeal?name=${encodeURIComponent(name)}`;
             console.log("Request URL:", url);
 

@@ -41,7 +41,7 @@ const GroceryListPage = () => {
         if (!location.state?.grocery) {
             loadGrocery();
         }
-    }, [location.state?.grocery]); // Dependency array ensures this runs only if the initial prop changes.
+    }, []); // Dependency array ensures this runs only if the initial prop changes.
 
     // Loading state while fetching data.
     if (isLoading) {

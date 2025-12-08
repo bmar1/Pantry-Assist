@@ -1,17 +1,4 @@
 services:
-  postgres:
-    image: postgres:17.4-alpine
-    environment:
-      POSTGRES_DB: ${"pantry"}
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - app-network
-
   backend:
     build:
       context: .
@@ -24,10 +11,8 @@ services:
       - DB_NAME=${DB_NAME:-pantry}
       - DB_USERNAME=${DB_USERNAME:-postgres}
       - DB_PASSWORD=${DB_PASSWORD:-postgres}
-      - ENV_JWT_KEY=${ENV_JWT_KEY}
+      - ENV_JWT_KEY=${jwtkey}
       - WALMART_KEY=${ENV_walmart_key}
-    depends_on:
-      - postgres
     networks:
       - app-network
 

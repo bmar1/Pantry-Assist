@@ -18,34 +18,34 @@ import lombok.NoArgsConstructor;
 @Embeddable
 public class UserPreference {
 
-	private int calories;
-	private double budget;
-	private int meals;
-	private boolean vegan;
+	private Integer calories;
+	private Double budget;
+	private Integer meals;
+	private Boolean vegan;
 	private String allergies;
     private boolean update;
 	public int getCalories() {
 		return calories;
 	}
-	public void setCalories(int calories) {
+	public void setCalories(Integer calories) {
 		this.calories = calories;
 	}
 	public double getBudget() {
 		return budget;
 	}
-	public void setBudget(double budget) {
+	public void setBudget(Double budget) {
 		this.budget = budget;
 	}
-	public int getMeals() {
+	public Integer getMeals() {
 		return meals;
 	}
 	public void setMeals(int meals) {
 		this.meals = meals;
 	}
-	public boolean isVegan() {
+	public Boolean isVegan() {
 		return vegan;
 	}
-	public void setVegan(boolean vegan) {
+	public void setVegan(Boolean vegan) {
 		this.vegan = vegan;
 	}
 	public String getAllergies() {
@@ -55,7 +55,7 @@ public class UserPreference {
 		this.allergies = allergies;
 	}
 
-    public boolean isUpdate(){
+    public Boolean isUpdate(){
         return update;
     }
 

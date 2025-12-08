@@ -5,6 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import spring.demo.config.security.JwtService;
 import spring.demo.controller.MainController;
@@ -500,6 +503,118 @@ public class MealPlanService {
         }
 
         return list;
+    }
+
+    public List<Recipe> selectMeals(@AuthenticationPrincipal UserDetails userDetails) {
+        String email = userDetails.getUsername();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        int req = user.getPreferences().getMeals();
+        int calorie = user.getPreferences().getCalories();
+        List<Recipe> subList = new ArrayList<>();
+
+        List<UserMealPlan> existingPlan = user.getMealPlans() != null
+                ? new ArrayList<>(user.getMealPlans())
+                : new ArrayList<>();
+
+        if (!existingPlan.isEmpty()) {
+            List<UserMealPlan> plannedMeals = existingPlan.stream()
+                    .filter(UserMealPlan::isPlanned)
+                    .collect(Collectors.toList());
+
+            log.info("User has {} meals marked as planned", plannedMeals.size());
+            plannedMeals.forEach(mp ->
+                    log.info("  - {} (ID: {}, Eaten: {}, Planned: {})",
+                            mp.getRecipe() != null ? mp.getRecipe().getName() : "null",
+                            mp.getId(),
+                            mp.isEaten(),
+                            mp.isPlanned())
+            );
+
+
+            subList = plannedMeals.stream()
+                    .map(UserMealPlan::getRecipe)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+
+            if (subList.isEmpty()) {
+                subList = recipeRepository.findMarkedRecipesByUserId(user.getId());
+                log.info("Sub list size after db: {}", subList.size());
+            }
+
+            // Check if all planned meals are eaten
+            boolean allPlannedMealsEaten = !plannedMeals.isEmpty() &&
+                    plannedMeals.stream().allMatch(UserMealPlan::isEaten);
+
+            if (allPlannedMealsEaten) {
+                log.info("All planned meals eaten. Unmarking and generating new plan...");
+
+                // Unmark old planned meals
+                plannedMeals.forEach(mealPlan -> mealPlan.setPlanned(false));
+
+                // Clear the old subList
+                subList.clear();
+
+                // Generate NEW meal plan
+                subList = generateSubRecipeList(req, calorie, existingPlan, new ArrayList<>());
+
+                // Continue to save the new meals below
+
+            } else if (subList.size() == req || subList.size() == req + 1) {
+                // Return existing planned meals (not all eaten yet)
+                log.info("Returning {} existing planned meals", subList.size());
+                return subList;
+            }
+        }
+
+        // Build new meal plan if we don't have enough
+        if (subList.size() < req) {
+            log.info("Need more meals. Generating {} meals...", req - subList.size());
+            subList = generateSubRecipeList(req, calorie, existingPlan, subList);
+        }
+
+        // Save new planned meals
+        for (Recipe recipe : subList) {
+            if (recipe != null) {
+                // Check if this recipe is already in the plan as planned
+                boolean alreadyExists = existingPlan.stream()
+                        .filter(mp -> mp != null)
+                        .filter(mp -> mp.getRecipe() != null)
+                        .filter(UserMealPlan::isPlanned)
+                        .anyMatch(mp -> mp.getRecipe().getId() == recipe.getId());
+
+                if (!alreadyExists) {
+                    UserMealPlan mealPlan = new UserMealPlan();
+                    mealPlan.setRecipe(recipe);
+                    mealPlan.setPlanned(true);
+                    mealPlan.setEaten(false);
+                    mealPlan.setUser(user);
+                    existingPlan.add(mealPlan);
+                    log.info("Adding new planned meal: {}", recipe.getName());
+                }
+            }
+        }
+
+        removeDuplicates(user, existingPlan);
+
+        // Update user's meal plans
+        user.setMealPlans(existingPlan);
+        userRepository.save(user);
+
+        // CRITICAL FIX: Rebuild subList from ONLY the planned meals in existingPlan
+        subList = existingPlan.stream()
+                .filter(UserMealPlan::isPlanned)
+                .filter(mp -> !mp.isEaten()) // Only return meals that aren't eaten yet
+                .map(UserMealPlan::getRecipe)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        log.info("Returning {} NEW planned meals to frontend: {}",
+                subList.size(),
+                subList.stream().map(Recipe::getName).collect(Collectors.joining(", ")));
+
+        return (subList);
     }
 
     public void findAndSaveMealPlan(User user) {

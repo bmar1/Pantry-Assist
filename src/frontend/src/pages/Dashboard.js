@@ -43,9 +43,7 @@ export default function Dashboard() {
 
 
   useEffect(() => {
-    loadGrocery();
-    loadData();
-    loadPreview();
+    loadDashboardData();
   }, []);
 
 
@@ -56,12 +54,10 @@ export default function Dashboard() {
     }
   }, [grocery, shouldNavigate, navigate]);
 
-
-  const loadData = async () => {
-    console.log(localStorage.getItem("token"));
-    const count = 3;
+  const loadDashboardData = async () => {
+    setIsLoading(true);
     try {
-      const response = await fetch(`http://localhost:8080/api/meals/selectMeals`, {
+      const response = await fetch(`http://localhost:8080/api/dashboard/initial-data`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -71,32 +67,33 @@ export default function Dashboard() {
 
       if (response.ok) {
         const data = await response.json();
-        setMeals(data);
-        setRecipe(data);
+
+        // Unpack the consolidated response
+        setMeals(data.selectedMeals);
+        setRecipe(data.selectedMeals);
+        setMealPreview(data.randomMeals);
+        setGrocery(data.groceryList);
+        setGroceryPreview(data.groceryList.slice(0, 3));
+      } else {
+        console.error("Failed to load dashboard data:", response.status);
+
+        setMeals([]);
+        setRecipe([]);
+        setMealPreview([]);
+        setGrocery([]);
+        setGroceryPreview([]);
       }
     } catch (error) {
-      console.error("Error parsing meals:", error);
+      console.error("Error loading dashboard data:", error);
+      setMeals([]);
+      setRecipe([]);
+      setMealPreview([]);
+      setGrocery([]);
+      setGroceryPreview([]);
     }
   };
 
-  const loadPreview = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/meals/random", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
 
-      if (response.ok) {
-        const data = await response.json();
-        setMealPreview(data);
-      }
-    } catch (error) {
-      console.error("Error parsing meals:", error);
-    }
-  };
 
   const handleRecipeClick = (recipeName) => {
     navigate("/recipe", { state: { name: recipeName } });
@@ -111,32 +108,6 @@ export default function Dashboard() {
     }
   };
 
-  const loadGrocery = async () => {
-    setIsGroceryLoading(true);
-    try {
-      const response = await fetch(`http://localhost:8080/api/meals/grocery`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setGrocery(data);
-        setGroceryPreview(data.slice(0, 3)); // Show the first 3 items in the preview
-      } else {
-        console.error("Failed to load grocery list:", response.status);
-        setGrocery([]);
-      }
-    } catch (error) {
-      console.error("Error loading grocery list:", error);
-      setGrocery([]);
-    } finally {
-      setIsGroceryLoading(false);
-    }
-  };
 
 
   return (

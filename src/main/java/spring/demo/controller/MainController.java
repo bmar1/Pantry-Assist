@@ -103,6 +103,17 @@ public class MainController {
         return ResponseEntity.ok(recipieList);
     }
 
+    //Returns all dashboard data
+    @GetMapping("/dashboard/load")
+    public ResponseEntity<DashboardData> loadDashBboard(@AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
+        List<Recipe> selectedMeals = mealPlanService.selectMeals(userDetails);
+        List<Recipe> randomMeals = random(userDetails);
+        List<Ingredient> groceryList = groceryList(userDetails);
+
+        DashboardData data = new DashboardData(selectedMeals, randomMeals, groceryList);
+        return ResponseEntity.ok(data);
+    }
+
 
     @PostMapping("/user/updatePref")
     public ResponseEntity<?> updatePref(@RequestBody UserPreference pref, @AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
@@ -217,10 +228,8 @@ public class MainController {
         return ResponseEntity.ok(recipe.get());
     }
 
-    //Return a random recipe from DB
-    @Transactional
-    @GetMapping("/meals/random")
-    public ResponseEntity<List<Recipe>> random(@AuthenticationPrincipal UserDetails userDetails) {
+    //These functions should be moved to a seperate service or class for clarity (grocery as well)
+    public List<Recipe> random(@AuthenticationPrincipal UserDetails userDetails) {
         String email = userDetails.getUsername();
 
         User user = userRepository.findByEmail(email)
@@ -229,126 +238,12 @@ public class MainController {
         int req = 2;
         List<Recipe> subList = recipeRepository.findRandomRecipes(req);
 
-        return ResponseEntity.ok(subList);
+        return subList;
     }
 
-    @GetMapping("/meals/selectMeals")
-    @Transactional
-    public ResponseEntity<List<Recipe>> selectMeals(@AuthenticationPrincipal UserDetails userDetails) {
-        String email = userDetails.getUsername();
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-        int req = user.getPreferences().getMeals();
-        int calorie = user.getPreferences().getCalories();
-        List<Recipe> subList = new ArrayList<>();
-
-        List<UserMealPlan> existingPlan = user.getMealPlans() != null
-                ? new ArrayList<>(user.getMealPlans())
-                : new ArrayList<>();
-
-        if (!existingPlan.isEmpty()) {
-            List<UserMealPlan> plannedMeals = existingPlan.stream()
-                    .filter(UserMealPlan::isPlanned)
-                    .collect(Collectors.toList());
-
-            log.info("User has {} meals marked as planned", plannedMeals.size());
-            plannedMeals.forEach(mp ->
-                    log.info("  - {} (ID: {}, Eaten: {}, Planned: {})",
-                            mp.getRecipe() != null ? mp.getRecipe().getName() : "null",
-                            mp.getId(),
-                            mp.isEaten(),
-                            mp.isPlanned())
-            );
 
 
-            subList = plannedMeals.stream()
-                    .map(UserMealPlan::getRecipe)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-
-            if (subList.isEmpty()) {
-                subList = recipeRepository.findMarkedRecipesByUserId(user.getId());
-                log.info("Sub list size after db: {}", subList.size());
-            }
-
-            // Check if all planned meals are eaten
-            boolean allPlannedMealsEaten = !plannedMeals.isEmpty() &&
-                    plannedMeals.stream().allMatch(UserMealPlan::isEaten);
-
-            if (allPlannedMealsEaten) {
-                log.info("All planned meals eaten. Unmarking and generating new plan...");
-
-                // Unmark old planned meals
-                plannedMeals.forEach(mealPlan -> mealPlan.setPlanned(false));
-
-                // Clear the old subList
-                subList.clear();
-
-                // Generate NEW meal plan
-                subList = mealPlanService.generateSubRecipeList(req, calorie, existingPlan, new ArrayList<>());
-
-                // Continue to save the new meals below
-
-            } else if (subList.size() == req || subList.size() == req + 1) {
-                // Return existing planned meals (not all eaten yet)
-                log.info("Returning {} existing planned meals", subList.size());
-                return ResponseEntity.ok(subList);
-            }
-        }
-
-        // Build new meal plan if we don't have enough
-        if (subList.size() < req) {
-            log.info("Need more meals. Generating {} meals...", req - subList.size());
-            subList = mealPlanService.generateSubRecipeList(req, calorie, existingPlan, subList);
-        }
-
-        // Save new planned meals
-        for (Recipe recipe : subList) {
-            if (recipe != null) {
-                // Check if this recipe is already in the plan as planned
-                boolean alreadyExists = existingPlan.stream()
-                        .filter(mp -> mp != null)
-                        .filter(mp -> mp.getRecipe() != null)
-                        .filter(UserMealPlan::isPlanned)
-                        .anyMatch(mp -> mp.getRecipe().getId() == recipe.getId());
-
-                if (!alreadyExists) {
-                    UserMealPlan mealPlan = new UserMealPlan();
-                    mealPlan.setRecipe(recipe);
-                    mealPlan.setPlanned(true);
-                    mealPlan.setEaten(false);
-                    mealPlan.setUser(user);
-                    existingPlan.add(mealPlan);
-                    log.info("Adding new planned meal: {}", recipe.getName());
-                }
-            }
-        }
-
-        mealPlanService.removeDuplicates(user, existingPlan);
-
-        // Update user's meal plans
-        user.setMealPlans(existingPlan);
-        userRepository.save(user);
-
-        // CRITICAL FIX: Rebuild subList from ONLY the planned meals in existingPlan
-        subList = existingPlan.stream()
-                .filter(UserMealPlan::isPlanned)
-                .filter(mp -> !mp.isEaten()) // Only return meals that aren't eaten yet
-                .map(UserMealPlan::getRecipe)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-
-        log.info("Returning {} NEW planned meals to frontend: {}",
-                subList.size(),
-                subList.stream().map(Recipe::getName).collect(Collectors.joining(", ")));
-
-        return ResponseEntity.ok(subList);
-    }
-
-    //Returns the users grocery list by items found in the recipe list
-    @GetMapping("/meals/grocery")
-    public ResponseEntity<List<Ingredient>> list(@AuthenticationPrincipal UserDetails userDetails) {
+    public List<Ingredient> groceryList(@AuthenticationPrincipal UserDetails userDetails) {
         String email = userDetails.getUsername();
 
         User user = userRepository.findByEmail(email)
@@ -358,6 +253,6 @@ public class MainController {
                 .map(UserIngredient::getIngredient)
                 .toList();
 
-        return ResponseEntity.ok(ingredients);
+        return ingredients;
     }
 }
