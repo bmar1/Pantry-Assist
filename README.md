@@ -36,3 +36,6 @@ git clone https://github.com/bmar1/Pantry-Assist.git
 npm install
 npm start
 ```
+
+####
+This project is maintained by me only. For contributions, please contact me, and we could discuss.
