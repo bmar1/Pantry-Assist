@@ -117,4 +117,15 @@ public class Ingredient {
         return productUrl;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getServingsPerContainer() {
+        return servingsPerContainer;
+    }
 }

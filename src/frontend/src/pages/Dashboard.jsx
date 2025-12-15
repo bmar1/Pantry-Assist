@@ -56,7 +56,7 @@ export default function Dashboard() {
 
   const loadDashboardData = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/dashboard/initial-data`, {
+      const response = await fetch(`http://localhost:8080/api/dashboard/load`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

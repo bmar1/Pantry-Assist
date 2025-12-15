@@ -15,5 +15,9 @@ public class DashboardData {
         this.groceryList = groceryList;
     }
 
+    public List<Recipe> getSelectedMeals() { return selectedMeals; }
+    public List<Recipe> getRandomMeals() { return randomMeals; }
+    public List<Ingredient> getGroceryList() { return groceryList; }
+
 
 }

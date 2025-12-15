@@ -9,39 +9,23 @@ const GroceryListPage = () => {
     const [groceryList, setGroceryList] = useState(() => location.state?.grocery || []);
     const [isLoading, setIsLoading] = useState(() => !location.state?.grocery);
 
-    // This effect runs only once on mount. Its only job is to fetch the grocery
-    // list if it wasn't passed in from the previous page.
     useEffect(() => {
-        const loadGrocery = async () => {
-            try {
-                const response = await fetch(`http://localhost:8080/api/meals/grocery`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                    },
-                });
+    // Only run if the raw list exists and has items
+    if (groceryList && groceryList.length > 0) {
+      
+      const seenNames = new Set();
+      
+      const uniqueList = groceryList.filter((item) => {
+      const isDuplicate = seenNames.has(item.name);
+    
+        seenNames.add(item.name);
+    
+        return !isDuplicate;
+      });
 
-                if (response.ok) {
-                    const data = await response.json();
-                    setGroceryList(data);
-                } else {
-                    console.error("Failed to load grocery list:", response.status);
-                    setGroceryList([]); // Set to empty on error
-                }
-            } catch (error) {
-                console.error("Error loading grocery list:", error);
-                setGroceryList([]); // Set to empty on error
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        // If grocery data is missing from location state, fetch it.
-        if (!location.state?.grocery) {
-            loadGrocery();
-        }
-    }, []); // Dependency array ensures this runs only if the initial prop changes.
+      setGroceryList(uniqueList);
+    }
+  }, []);
 
     // Loading state while fetching data.
     if (isLoading) {

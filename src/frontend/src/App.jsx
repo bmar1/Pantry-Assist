@@ -12,7 +12,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
-    <DarkModeProvider>
+
       <Router>
         <Routes>
           <Route path="/" element={<Navigate to="/landing" replace />} />
@@ -61,7 +61,7 @@ function App() {
           />
         </Routes>
       </Router>
-    </DarkModeProvider>
+    
   );
 }
 

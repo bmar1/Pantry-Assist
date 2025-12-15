@@ -42,8 +42,8 @@ public class Recipe {
     private Map<String, String> ingredients; // ingredient -> measure
 
     // getters and setters
-    public String getIdMeal() {
-        return idMeal;
+    public long getId() {
+        return id;
     }
 
     public void setIdMeal(String idMeal) {
