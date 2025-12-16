@@ -8,11 +8,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useDarkMode } from "../contexts/DarkModeContext";
+
 
 export default function Settings({ setShowSettings, setShowPreferences }) {
   const navigate = useNavigate();
-  const { darkMode, setDarkMode } = useDarkMode();
 
   // Sends a request to the backend to delete the user's account.
   // On success, it clears localStorage and redirects to the login page.

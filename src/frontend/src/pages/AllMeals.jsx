@@ -52,7 +52,7 @@ export default function AllMeals() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-black">
+        <div className="min-h-screen bg-gray-100 ">
             <Nav
                 isNavVisible={isNavVisible}
                 setIsNavVisible={setIsNavVisible}

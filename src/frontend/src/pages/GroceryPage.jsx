@@ -57,11 +57,11 @@ const GroceryListPage = () => {
     const totalPrice = groceryList.reduce((sum, item) => sum + (item.totalPrice || 0), 0);
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-[#6d9851] to-[#5A7A4D] dark:bg-black flex justify-center items-start p-4 sm:p-6 md:p-8">
-            <div className="max-w-4xl w-full bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 sm:p-8 border border-transparent">
+        <div className="min-h-screen bg-gradient-to-b from-[#6d9851] to-[#5A7A4D] flex justify-center items-start p-4 sm:p-6 md:p-8">
+            <div className="max-w-4xl w-full bg-white rounded-2xl shadow-2xl p-6 sm:p-8 border border-transparent">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-4xl font-bold text-[#446437] dark:text-gray-100">Grocery List</h1>
+                    <h1 className="text-4xl font-bold text-[#446437]">Grocery List</h1>
                     <button
                         onClick={() => navigate("/dashboard")}
                         className="px-4 py-2 bg-[#446437] text-white rounded-lg hover:bg-[#5A7A4D] transition-colors"
@@ -73,18 +73,18 @@ const GroceryListPage = () => {
                 {/* Items List */}
                 <div className="space-y-4">
                     {groceryList.map((item, index) => (
-                        <div key={index} className="flex items-center bg-gray-50 dark:bg-gray-700 p-4 rounded-xl shadow-md transition-shadow hover:shadow-lg">
+                        <div key={index} className="flex items-center bg-gray-50 p-4 rounded-xl shadow-md transition-shadow hover:shadow-lg">
                             <img
                                 src={item.imageUrl || '/icons/groceryIcon.png'}
                                 alt={item.name}
-                                className="w-20 h-20 object-cover rounded-lg border-2 border-gray-200 dark:border-gray-600"
+                                className="w-20 h-20 object-cover rounded-lg border-2 border-gray-200"
                             />
                             <div className="flex-grow ml-4">
-                                <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">{item.name || "Unnamed Item"}</h2>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">Servings: {item.servingsPerContainer || "N/A"}</p>
+                                <h2 className="text-xl font-semibold text-gray-800">{item.name || "Unnamed Item"}</h2>
+                                <p className="text-sm text-gray-500">Servings: {item.servingsPerContainer || "N/A"}</p>
                             </div>
                             <div className="text-right">
-                                <p className="text-xl font-bold text-[#446437] dark:text-green-400">${(item.totalPrice || 0).toFixed(2)}</p>
+                                <p className="text-xl font-bold text-[#446437]">${(item.totalPrice || 0).toFixed(2)}</p>
                                 <a
                                     href={item.productUrl || "#"}
                                     target="_blank"
@@ -98,9 +98,9 @@ const GroceryListPage = () => {
                     ))}
                 </div>
 
-                <div className="mt-8 pt-6 border-t-2 border-gray-200 dark:border-gray-600 flex justify-end items-center">
-                    <span className="text-2xl font-semibold text-gray-600 dark:text-gray-300 mr-4">Total:</span>
-                    <span className="text-3xl font-bold text-[#446437] dark:text-green-400">${totalPrice.toFixed(2)}</span>
+                <div className="mt-8 pt-6 border-t-2 border-gray-200 flex justify-end items-center">
+                    <span className="text-2xl font-semibold text-gray-600 mr-4">Total:</span>
+                    <span className="text-3xl font-bold text-[#446437]">${totalPrice.toFixed(2)}</span>
                 </div>
             </div>
         </div>

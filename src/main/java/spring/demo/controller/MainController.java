@@ -51,7 +51,6 @@ public class MainController {
     private RecipeRepository recipeRepository;
     private static final Logger log = LoggerFactory.getLogger(MainController.class);
 
-
     private ArrayList<Recipe> recipieList = new ArrayList<Recipe>();
     private ArrayList<Ingredient> priceList = new ArrayList<Ingredient>();
 
@@ -107,8 +106,8 @@ public class MainController {
     @GetMapping("/dashboard/load")
     public ResponseEntity<DashboardData> loadDashBboard(@AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
         List<Recipe> selectedMeals = mealPlanService.selectMeals(userDetails);
-        List<Recipe> randomMeals = random(userDetails);
-        List<Ingredient> groceryList = groceryList(userDetails);
+        List<Recipe> randomMeals = mealPlanService.random(userDetails);
+        List<Ingredient> groceryList = mealPlanService.groceryList(userDetails);
 
         DashboardData data = new DashboardData(selectedMeals, randomMeals, groceryList);
         return ResponseEntity.ok(data);
@@ -146,7 +145,7 @@ public class MainController {
         // Find the UserMealPlan that matches the recipe name AND is planned
         Optional<UserMealPlan> mealPlanToMark = user.getMealPlans().stream()
                 .filter(mealPlan -> mealPlan.getRecipe() != null)
-                .filter(UserMealPlan::isPlanned) // CRITICAL: Only get planned meals
+                .filter(UserMealPlan::isPlanned)
                 .filter(mealPlan -> mealPlan.getRecipe().getName().equals(name))
                 .findFirst();
 
@@ -203,7 +202,6 @@ public class MainController {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         if (name == null || name.isBlank()) {
-            log.warn("Bad request: 'name' parameter is missing or blank");
             return ResponseEntity.badRequest().body("Missing required parameter: name");
         }
 
@@ -213,46 +211,12 @@ public class MainController {
 
         // Search DB if not found locally
         if (recipe.isEmpty()) {
-            log.debug("Recipe not found in memory list. Checking database...");
             recipe = user.getMealPlans().stream()
                     .map(UserMealPlan::getRecipe)
                     .filter(r -> r.getName().equalsIgnoreCase(name))
                     .findFirst();
         }
 
-        // If still not found
-        if (recipe.isEmpty()) {
-            log.warn("Recipe not found: {}", name);
-            return ResponseEntity.status(404).body("Recipe not found: " + name);
-        }
         return ResponseEntity.ok(recipe.get());
-    }
-
-    //These functions should be moved to a seperate service or class for clarity (grocery as well)
-    public List<Recipe> random(@AuthenticationPrincipal UserDetails userDetails) {
-        String email = userDetails.getUsername();
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-        int req = 2;
-        List<Recipe> subList = recipeRepository.findRandomRecipes(req);
-
-        return subList;
-    }
-
-
-
-    public List<Ingredient> groceryList(@AuthenticationPrincipal UserDetails userDetails) {
-        String email = userDetails.getUsername();
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-        List<Ingredient> ingredients = user.getGroceryList().stream()
-                .map(UserIngredient::getIngredient)
-                .toList();
-
-        return ingredients;
     }
 }

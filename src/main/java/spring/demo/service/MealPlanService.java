@@ -1,3 +1,7 @@
+/*
+This services provides a list of methods to use regarding meal and ingredient data regarding a user, aimed at designing a new meal plan, calculating meals and etc
+ */
+
 package spring.demo.service;
 
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import spring.demo.config.security.JwtService;
-import spring.demo.controller.MainController;
 import spring.demo.models.*;
 import spring.demo.models.repository.IngredientRepository;
 import spring.demo.models.repository.RecipeRepository;
@@ -327,11 +330,7 @@ public class MealPlanService {
     }
 
 
-    /*
-    @param: recipe to be used to calculate serving size
-    This function takes the main protein source of a meal, based on weight determines its serving size assuming an adults avg protein intake
-    It adds servings based on weight of other spices and ingredients
-     */
+    //unused for now
     public int getServingSize(Recipe recipe) {
         int proteinWeight = recipe.extract_weight("Chicken");
         if (proteinWeight == 0) {
@@ -388,7 +387,6 @@ public class MealPlanService {
                 neighbors.addAll(ingredientMap.getOrDefault(ingredient, Collections.emptySet()));
             }
 
-            // Remove self
             neighbors.remove(recipe);
 
             // Count number of common ingredients with any neighbor
@@ -415,8 +413,6 @@ public class MealPlanService {
 
     //Find all user meals and generate new recipe list based off requirements
     public List<Recipe> generateSubRecipeList(int req, int calorie, List<UserMealPlan> existingPlan, List<Recipe> alreadySelected) {
-        // FIXED: Find all meals from existingPlan that are NOT planned and NOT eaten
-        // These are the "available" recipes the user has tried before but can reuse
         List<Recipe> allMeals = existingPlan.stream()
                 .filter(Objects::nonNull)
                 .filter(plan -> plan.getRecipe() != null)
@@ -433,7 +429,6 @@ public class MealPlanService {
         log.info("Generating meal plan: need {}, have {}, available from history: {}",
                 req, list.size(), allMeals.size());
 
-        // Layer 1: Find recipes from user's meal history (not currently planned or eaten)
         if (allMeals != null && !allMeals.isEmpty()) {
             for (Recipe recipe : allMeals) {
                 if (list.size() >= req) break;
@@ -446,7 +441,6 @@ public class MealPlanService {
             }
         }
 
-        // Layer 2: Find recipes from local recipe list
         if (list.size() < req && recipieList != null) {
             for (Recipe recipe : recipieList) {
                 if (list.size() >= req) break;
@@ -532,7 +526,6 @@ public class MealPlanService {
                             mp.isPlanned())
             );
 
-
             subList = plannedMeals.stream()
                     .map(UserMealPlan::getRecipe)
                     .filter(Objects::nonNull)
@@ -550,16 +543,11 @@ public class MealPlanService {
             if (allPlannedMealsEaten) {
                 log.info("All planned meals eaten. Unmarking and generating new plan...");
 
-                // Unmark old planned meals
                 plannedMeals.forEach(mealPlan -> mealPlan.setPlanned(false));
-
-                // Clear the old subList
                 subList.clear();
 
-                // Generate NEW meal plan
                 subList = generateSubRecipeList(req, calorie, existingPlan, new ArrayList<>());
 
-                // Continue to save the new meals below
 
             } else if (subList.size() == req || subList.size() == req + 1) {
                 // Return existing planned meals (not all eaten yet)
@@ -574,6 +562,11 @@ public class MealPlanService {
             subList = generateSubRecipeList(req, calorie, existingPlan, subList);
         }
 
+        savePlannedMeals(subList, existingPlan, user);
+        return (subList);
+    }
+
+    private List<Recipe> savePlannedMeals(List<Recipe> subList, List<UserMealPlan> existingPlan, User user) {
         // Save new planned meals
         for (Recipe recipe : subList) {
             if (recipe != null) {
@@ -602,7 +595,6 @@ public class MealPlanService {
         user.setMealPlans(existingPlan);
         userRepository.save(user);
 
-        // CRITICAL FIX: Rebuild subList from ONLY the planned meals in existingPlan
         subList = existingPlan.stream()
                 .filter(UserMealPlan::isPlanned)
                 .filter(mp -> !mp.isEaten()) // Only return meals that aren't eaten yet
@@ -610,11 +602,7 @@ public class MealPlanService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-        log.info("Returning {} NEW planned meals to frontend: {}",
-                subList.size(),
-                subList.stream().map(Recipe::getName).collect(Collectors.joining(", ")));
-
-        return (subList);
+        return subList;
     }
 
     public void findAndSaveMealPlan(User user) {
@@ -652,5 +640,32 @@ public class MealPlanService {
                         existingPlanRecipeIds.contains(plan.getRecipe().getId()) &&
                         !plan.isPlanned()
         );
+    }
+
+    public List<Recipe> random(@AuthenticationPrincipal UserDetails userDetails) {
+        String email = userDetails.getUsername();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        int req = 2;
+        List<Recipe> subList = recipeRepository.findRandomRecipes(req);
+
+        return subList;
+    }
+
+
+
+    public List<Ingredient> groceryList(@AuthenticationPrincipal UserDetails userDetails) {
+        String email = userDetails.getUsername();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        List<Ingredient> ingredients = user.getGroceryList().stream()
+                .map(UserIngredient::getIngredient)
+                .toList();
+
+        return ingredients;
     }
 }

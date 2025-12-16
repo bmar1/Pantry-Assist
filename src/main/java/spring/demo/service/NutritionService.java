@@ -1,5 +1,5 @@
 /*
-This API service is deprecated, as nutritionix's free API tier is no longer supported.
+This API service is deprecated, as nutritionix's free API tier is no longer supported. However this was used to fetch all meal price data.
  */
 
 package spring.demo.service;

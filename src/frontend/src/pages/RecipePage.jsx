@@ -5,7 +5,7 @@ import { useLocation } from "react-router-dom";
 import { useState, useEffect, useMemo } from "react";
 
 const RecipePage = () => {
-
+    const navigate = useNavigate();
     const location = useLocation();
     const { name } = location.state || {}
     const [recipe, setRecipe] = useState(null);
@@ -41,6 +41,11 @@ const RecipePage = () => {
             console.error("Error marking meal as eaten:", error);
         }
     };
+
+    const handleBack = () => {
+    navigate('/dashboard');
+  };
+
 
     useEffect(() => {
         const loadMeal = async () => {
@@ -86,6 +91,12 @@ const RecipePage = () => {
             .filter(step => step.trim() !== '');
     }, [recipe?.instructions]);
 
+      const completionPercentage = steps.length > 0 
+    ? Math.round((stepCompleted.filter(Boolean).length / steps.length) * 100)
+    : 0;
+
+     const allStepsCompleted = steps.length > 0 && stepCompleted.filter(Boolean).length === steps.length;
+
     // Initialize stepCompleted only when steps change
     useEffect(() => {
         if (steps && steps.length > 0) {
@@ -121,8 +132,6 @@ const RecipePage = () => {
                     await markMealAsEaten();
                 } catch (error) {
                     console.error("Failed to mark meal as eaten:", error);
-                    // Optionally reset mealEaten on error
-                    // setMealEaten(false);
                 }
             }
         };
@@ -130,12 +139,7 @@ const RecipePage = () => {
         markMeal();
     }, [mealEaten, name]);
 
-    console.log("Full recipe object:", recipe);
-    console.log("Name: ", name)
-    console.log("Recipe ingredients:", recipe?.ingredients);
-    console.log("Type of ingredients:", typeof recipe?.ingredients);
 
-    const navigate = useNavigate();
 
     // Convert YouTube URL to embed format
     const getYouTubeEmbedUrl = (url) => {
@@ -174,171 +178,259 @@ const RecipePage = () => {
         );
     }
 
-    // markMealAsEaten should be stable or memoized
-
-
-    console.log(steps);
-
-
     return (
-        <div className="min-h-screen bg-gradient-to-b from-[#6d9851] to-[#5A7A4D] dark:bg-black flex justify-center items-start p-6">
-            {showPopup && (
-                <div className="fixed bottom-5 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg z-50">
-                    <p>Congratulations on your meal!</p>
-                </div>
-            )}
-            <div className="max-w-4xl w-full bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
-                {/* Back Button */}
-                <div className="p-6">
-                    <button
-                        onClick={() => navigate("/dashboard")}
-                        className="px-4 py-2 bg-[#7A9E7E] text-white rounded-lg hover:bg-[#668B67] transition-colors"
-                    >
-                        Back to Dashboard
-                    </button>
-                </div>
-
-                {/* Hero Section */}
-                {recipe.thumbnail && (
-                    <div className="relative h-80">
-                        <img
-                            src={recipe.thumbnail}
-                            alt={recipe.name}
-                            className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                        <div className="absolute bottom-0 left-0 p-6">
-                            <h1 className="text-4xl md:text-5xl font-bold text-white mb-2 drop-shadow-lg">
-                                {recipe.name}
-                            </h1>
-                            <div className="flex gap-2">
-                                <span className="px-3 py-1 bg-white/30 backdrop-blur-md text-white rounded-full text-sm font-medium">
-                                    {recipe.category}
-                                </span>
-                                <span className="px-3 py-1 bg-white/30 backdrop-blur-md text-white rounded-full text-sm font-medium">
-                                    {recipe.area}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                <div className="p-6">
-                    {/* Nutritional Info */}
-                    {(recipe.calories > 0 || recipe.protein > 0 || recipe.carbohydrate > 0 || recipe.fat > 0) && (
-                        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
-                            <h2 className="text-2xl font-semibold mb-3 text-[#5C7A62] dark:text-gray-200">Nutritional Information</h2>
-
-                            {recipe.calories > 0 && (
-                                <div className="text-start">
-                                    <p className="font-medium pr-5 text-gray-600 dark:text-gray-400">Calories</p>
-                                    <p className="text-xl pr-5 font-bold text-[#5C7A62] dark:text-gray-200">{recipe.calories} kcal</p>
-                                </div>
-                            )}
-                            {recipe.protein > 0 && (
-                                <div className="text-center">
-                                    <p className="font-medium text-gray-600 dark:text-gray-400">Protein</p>
-                                    <p className="text-xl font-bold text-[#5C7A62] dark:text-gray-200">{recipe.protein}g</p>
-                                </div>
-                            )}
-                            {recipe.carbohydrate > 0 && (
-                                <div className="text-center">
-                                    <p className="font-medium text-gray-600 dark:text-gray-400">Carbs</p>
-                                    <p className="text-xl font-bold text-[#5C7A62] dark:text-gray-200">{recipe.carbohydrate}g</p>
-                                </div>
-                            )}
-                            {recipe.fat > 0 && (
-                                <div className="text-center">
-                                    <p className="font-medium text-gray-600 dark:text-gray-400">Fat</p>
-                                    <p className="text-xl font-bold text-[#5C7A62] dark:text-gray-200">{recipe.fat}g</p>
-                                </div>
-                            )}
-
-                        </div>
-                    )}
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {/* Ingredients */}
-                        <div className="md:col-span-1">
-                            <h2 className="text-2xl font-semibold mb-3 text-[#5C7A62] dark:text-gray-200">Ingredients</h2>
-                            <ul className="space-y-2">
-                                {recipe.ingredients && Object.entries(recipe.ingredients).map(([ingredient, measure], index) => (
-                                    <li key={index} className="flex items-start p-2 bg-gray-50 dark:bg-gray-700 rounded-md">
-                                        <span className="text-[#7A9E7E] mr-3 mt-1">•</span>
-                                        <span className="text-gray-700 dark:text-gray-300">
-                                            <span className="font-bold">{measure}</span> {ingredient}
-                                        </span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Instructions */}
-                        <div className="md:col-span-2">
-                            <h2 className="text-2xl font-semibold mb-3 text-[#5C7A62] dark:text-gray-200">Instructions</h2>
-                            <ol className="space-y-4">
-                                {steps.map((step, index) => (
-                                    <li
-                                        key={index}
-                                        className={`flex items-center p-4 rounded-lg cursor-pointer transition-colors ${stepCompleted[index] ? 'bg-green-500 text-white' : 'bg-gray-100 dark:bg-gray-700'
-                                            }`}
-                                        onClick={() => {
-                                            const newStepCompleted = [...stepCompleted];
-                                            newStepCompleted[index] = !newStepCompleted[index];
-                                            setStepCompleted(newStepCompleted);
-                                        }}
-                                    >
-                                        <div
-                                            className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center mr-4 font-bold ${stepCompleted[index]
-                                                ? 'bg-white text-green-500'
-                                                : 'bg-[#7A9E7E] text-white'
-                                                }`}
-                                        >
-                                            {index + 1}
-                                        </div>
-                                        <div className="text-gray-700 dark:text-gray-300">{step}</div>
-                                    </li>
-                                ))}
-                            </ol>
-                        </div>
-                    </div>
-
-                    {/* YouTube Video */}
-                    {embedUrl && (
-                        <div className="mt-8">
-                            <h2 className="text-2xl font-semibold mb-4 text-[#5C7A62] dark:text-gray-200">Video Tutorial</h2>
-                            <div className="aspect-w-16 aspect-h-9 h-[450px]">
-                                <iframe
-                                    src={embedUrl}
-                                    title="YouTube video player"
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                    className="w-full h-full rounded-lg shadow-md"
-                                ></iframe>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Tags */}
-                    {recipe.tags && (
-                        <div className="mt-8">
-                            <h2 className="text-xl font-semibold mb-3 text-[#5C7A62] dark:text-gray-200">Tags</h2>
-                            <div className="flex flex-wrap gap-2">
-                                {recipe.tags.split(',').map((tag, index) => (
-                                    <span
-                                        key={index}
-                                        className="px-3 py-1 bg-[#E8F3E8] text-[#5C7A62] rounded-full text-sm font-medium"
-                                    >
-                                        {tag.trim()}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-[#6d9851] via-[#5A7A4D] to-[#4a6340] flex justify-center items-start">
+      {/* Success Popup */}
+      {showPopup && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#6d9851] to-[#5A7A4D] text-white px-8 py-4 rounded-xl shadow-2xl z-50 animate-bounce">
+          <div className="flex items-center gap-3">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="font-semibold">Congratulations on completing your meal!</p>
+          </div>
         </div>
-    );
-}
+      )}
+
+      <div className="max-w-6xl w-full mx-4 my-8">
+        {/* Header with Back Button */}
+        <div className="mb-6 flex items-center justify-between">
+          <button
+            onClick={handleBack}
+            className="flex items-center gap-2 px-6 py-3 bg-white/20 backdrop-blur-md text-white rounded-xl hover:bg-white/30 transition-all duration-300 shadow-lg hover:shadow-xl"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            <span className="font-semibold">Back to Dashboard</span>
+          </button>
+
+          {/* Progress Badge */}
+          {steps.length > 0 && (
+            <div className="bg-white/20 backdrop-blur-md text-white px-6 py-3 rounded-xl shadow-lg">
+              <div className="flex items-center gap-3">
+                <div className="relative w-12 h-12">
+                  <svg className="transform -rotate-90 w-12 h-12">
+                    <circle
+                      cx="24"
+                      cy="24"
+                      r="20"
+                      stroke="white"
+                      strokeWidth="4"
+                      fill="none"
+                      opacity="0.3"
+                    />
+                    <circle
+                      cx="24"
+                      cy="24"
+                      r="20"
+                      stroke="white"
+                      strokeWidth="4"
+                      fill="none"
+                      strokeDasharray={`${2 * Math.PI * 20}`}
+                      strokeDashoffset={`${2 * Math.PI * 20 * (1 - completionPercentage / 100)}`}
+                      className="transition-all duration-500"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center text-sm font-bold">
+                    {completionPercentage}%
+                  </div>
+                </div>
+                <div>
+                  <div className="text-sm opacity-90">Progress</div>
+                  <div className="text-xs opacity-75">{stepCompleted.filter(Boolean).length}/{steps.length} steps</div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Main Content Card */}
+        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+          {/* Hero Section with Image */}
+          {recipe.thumbnail && (
+            <div className="relative h-96 group overflow-hidden">
+              <img
+                src={recipe.thumbnail}
+                alt={recipe.name}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-8">
+                <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 drop-shadow-2xl">
+                  {recipe.name}
+                </h1>
+                <div className="flex flex-wrap gap-3">
+                  <span className="px-4 py-2 bg-white/25 backdrop-blur-lg text-white rounded-full text-sm font-semibold border border-white/30 shadow-lg">
+                     {recipe.category}
+                  </span>
+                  <span className="px-4 py-2 bg-white/25 backdrop-blur-lg text-white rounded-full text-sm font-semibold border border-white/30 shadow-lg">
+                     {recipe.area}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="p-8">
+            {/* Nutritional Info Cards */}
+            {(recipe.calories > 0 || recipe.protein > 0 || recipe.carbohydrate > 0 || recipe.fat > 0) && (
+              <div className="mb-8">
+                <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-3">
+                  <span className="text-3xl"></span>
+                  Nutrition Facts
+                </h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {recipe.calories > 0 && (
+                    <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-5 rounded-2xl border-2 border-orange-200 shadow-md hover:shadow-lg transition-shadow">
+                      <div className="text-orange-600 text-2xl mb-2"></div>
+                      <p className="text-sm font-medium text-gray-600 mb-1">Calories</p>
+                      <p className="text-3xl font-bold text-orange-700">{recipe.calories}</p>
+                      <p className="text-xs text-gray-500 mt-1">kcal</p>
+                    </div>
+                  )}
+                  
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Ingredients Section */}
+              <div className="lg:col-span-1">
+                <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-3">
+                  <span className="text-3xl"></span>
+                  Ingredients
+                </h2>
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200 shadow-lg">
+                  <ul className="space-y-3">
+                    {recipe.ingredients && Object.entries(recipe.ingredients).map(([ingredient, measure], index) => (
+                      <li key={index} className="flex items-start p-3 bg-white rounded-xl hover:shadow-md transition-shadow">
+                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#6d9851] text-white flex items-center justify-center text-xs font-bold mr-3 mt-0.5">
+                          {index + 1}
+                        </span>
+                        <span className="text-gray-700 flex-1">
+                          <span className="font-bold text-[#5A7A4D]">{measure}</span>
+                          <span className="mx-1">•</span>
+                          <span>{ingredient}</span>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Instructions Section */}
+              <div className="lg:col-span-2">
+                <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-3">
+                  <span className="text-3xl"></span>
+                  Cooking Steps
+                </h2>
+                <div className="space-y-4">
+                  {steps.map((step, index) => (
+                    <div
+                      key={index}
+                      className={`group relative rounded-2xl cursor-pointer transition-all duration-300 overflow-hidden ${
+                        stepCompleted[index]
+                          ? 'bg-gradient-to-r from-[#6d9851] to-[#5A7A4D] shadow-lg'
+                          : 'bg-white border-2 border-gray-200 hover:border-[#6d9851] hover:shadow-md'
+                      }`}
+                      onClick={() => {
+                        const newStepCompleted = [...stepCompleted];
+                        newStepCompleted[index] = !newStepCompleted[index];
+                        setStepCompleted(newStepCompleted);
+                        
+                        if (!stepCompleted[index] && newStepCompleted.filter(Boolean).length === steps.length) {
+                          setShowPopup(true);
+                          setTimeout(() => setShowPopup(false), 4000);
+                        }
+                      }}
+                    >
+                      <div className="flex items-start p-5">
+                        <div
+                          className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center mr-4 font-bold text-lg transition-all duration-300 ${
+                            stepCompleted[index]
+                              ? 'bg-white text-[#6d9851] shadow-lg'
+                              : 'bg-gradient-to-br from-[#6d9851] to-[#5A7A4D] text-white'
+                          }`}
+                        >
+                          {stepCompleted[index] ? '✓' : index + 1}
+                        </div>
+                        <div className={`flex-1 ${stepCompleted[index] ? 'text-white' : 'text-gray-700'}`}>
+                          <p className={`leading-relaxed ${stepCompleted[index] ? 'line-through opacity-90' : ''}`}>
+                            {step}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Completion indicator */}
+                      {stepCompleted[index] && (
+                        <div className="absolute top-3 right-3 bg-white/30 backdrop-blur-sm px-3 py-1 rounded-full text-white text-xs font-semibold">
+                          Completed
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Complete All Button */}
+                {!allStepsCompleted && steps.length > 0 && (
+                  <button
+                    onClick={() => {
+                      setStepCompleted(steps.map(() => true));
+                      setShowPopup(true);
+                      setTimeout(() => setShowPopup(false), 4000);
+                    }}
+                    className="mt-6 w-full py-4 bg-gradient-to-r from-[#6d9851] to-[#5A7A4D] text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+                  >
+                     Mark All Steps as Complete
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Video Tutorial */}
+            {embedUrl && (
+              <div className="mt-12">
+                <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-3">
+                  <span className="text-3xl"></span>
+                  Video Tutorial
+                </h2>
+                <div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-gray-100">
+                  <div className="aspect-video">
+                    <iframe
+                      src={embedUrl}
+                      title="YouTube video player"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="w-full h-full"
+                    ></iframe>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Tags */}
+            {recipe.tags && (
+              <div className="mt-12">
+                <h2 className="text-2xl font-bold mb-4 text-gray-800">Tags</h2>
+                <div className="flex flex-wrap gap-3">
+                  {recipe.tags.split(',').map((tag, index) => (
+                    <span
+                      key={index}
+                      className="px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 text-[#5A7A4D] rounded-full text-sm font-semibold border-2 border-green-200 hover:shadow-md transition-shadow"
+                    >
+                      #{tag.trim()}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default RecipePage;

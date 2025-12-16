@@ -46,6 +46,7 @@ public class WalmartServiceHeaders {
     @Value("classpath:walmart_private_key.pem")
     private Resource privateKeyResource;
 
+    //loads private key and decodes for authsig
     private PrivateKey loadKey() throws Exception {
         String key = new String(privateKeyResource.getInputStream().readAllBytes(), StandardCharsets.UTF_8)
                 .replace("-----BEGIN PRIVATE KEY-----", "")

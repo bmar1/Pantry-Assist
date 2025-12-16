@@ -20,7 +20,7 @@ export default function Landing() {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-[#f7f5f0] dark:bg-black">
+        <div className="flex flex-col min-h-screen bg-[#f7f5f0">
             {/* Navigation Bar */}
             <nav className="bg-gradient-to-b from-[#618c45] to-[#5A7A4D] shadow-md px-4 sm:px-8 py-4 flex items-center justify-between">
                 {/* Left Side Group */}
@@ -149,12 +149,12 @@ export default function Landing() {
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
             >
-                <div className="py-20 relative bg-gradient-to-b from-[#f7faf5] to-[#eef3e8] dark:from-[#0a0a0a] dark:to-[#111]">
+                <div className="py-20 relative bg-gradient-to-b from-[#f7faf5] to-[#eef3e8]">
 
                     {/* Ambient CSS Glow */}
                     <div className="absolute inset-0 pointer-events-none 
             bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.35),transparent_70%)]
-            dark:bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05),transparent_70%)]
+            
         " />
 
                     <h1 className="text-black font-semibold text-5xl md:text-6xl text-center mb-12 relative z-10">
@@ -188,9 +188,9 @@ export default function Landing() {
                                 key={i}
                                 className="
                         p-6 rounded-2xl 
-                        bg-white/60 dark:bg-white/5 
+                        bg-white/60 
                         backdrop-blur-xl 
-                        border border-white/40 dark:border-white/10 
+                        border border-white/40 
                         shadow-lg hover:shadow-2xl 
                         flex flex-col items-center text-center
                         hover:scale-105 transition-all duration-300
@@ -209,12 +209,11 @@ export default function Landing() {
             <div className="w-full h-10 shadow-[0_-25px_40px_-20px_rgba(0,0,0,0.35)]" />
 
             {/* ——— Mid-page CTA ——— */}
-            <div className="py-20 relative text-center bg-gradient-to-t from-[#f9fbf7] to-[#f0f5ea] dark:from-[#0a0a0a] dark:to-black">
+            <div className="py-20 relative text-center bg-gradient-to-t from-[#f9fbf7] to-[#f0f5ea]">
 
                 {/* Top Glow */}
                 <div className="absolute inset-x-0 top-0 h-40 
         bg-gradient-to-b from-white/40 to-transparent
-        dark:from-white/5 dark:to-transparent
         pointer-events-none
     " />
 
@@ -222,7 +221,7 @@ export default function Landing() {
                     Start Saving on Groceries Today — For Free
                 </h2>
 
-                <p className="text-lg text-[#336e32] dark:text-gray-300 max-w-2xl mx-auto mb-8 relative z-10">
+                <p className="text-lg text-[#336e32]  max-w-2xl mx-auto mb-8 relative z-10">
                     Build your personalized meal plan in under one minute.
                 </p>
 
@@ -237,13 +236,12 @@ export default function Landing() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.3 }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className="py-20 relative bg-gradient-to-b from-[#f5f8f2] to-white dark:from-black dark:to-gray-900"
+                className="py-20 relative bg-gradient-to-b from-[#f5f8f2] to-white"
             >
 
                 {/* Ambient Glow */}
                 <div className="absolute inset-0 pointer-events-none 
         bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.25),transparent_75%)]
-        dark:bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06),transparent_75%)]
     " />
 
                 <h2 className="text-black font-semibold text-5xl md:text-6xl text-center mb-12 relative z-10">
@@ -278,9 +276,9 @@ export default function Landing() {
                             key={i}
                             className="
                     relative rounded-2xl overflow-hidden 
-                    bg-white/60 dark:bg-white/5 
+                    bg-white/60 
                     backdrop-blur-xl 
-                    border border-white/40 dark:border-white/10 
+                    border border-white/40 
                     shadow-lg hover:shadow-2xl 
                     hover:scale-105 
                     transition-all duration-300
@@ -290,10 +288,10 @@ export default function Landing() {
                             <div className="p-6">
                                 <h3 className="text-2xl font-semibold mb-2 text-[#2c5e2]">{meal.title}</h3>
                                 <p className="text-base font-medium text-[#336e32]">{meal.info}</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{meal.desc}</p>
+                                <p className="text-sm text-gray-500 mb-4">{meal.desc}</p>
                             </div>
 
-                            <div className="absolute inset-0 bg-white/70 dark:bg-black/50 backdrop-blur-md 
+                            <div className="absolute inset-0 bg-white/70  backdrop-blur-md 
                     flex items-center justify-center px-6
                     opacity-0 hover:opacity-100 transition duration-300 text-center
                 ">

@@ -8,11 +8,13 @@
  */
 
 import { useNavigate } from 'react-router-dom';
+import { useRef } from 'react';
 import React, { useState, useEffect } from "react";
 import OnboardingCard from "../components/OnboardCard";
 import Settings from "../components/Settings";
 import SettingsOnboard from "../components/SettingsOnboard";
 import Nav from "../components/Navbar";
+import NewMealPlanShowcase from '../components/NewMealShowcase';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -22,9 +24,10 @@ export default function Dashboard() {
   );
 
   const [isNavVisible, setIsNavVisible] = useState(false);
+  const previousMealIdsRef = useRef(null);
   const [meals, setMeals] = useState([]);
+  const [showNewMealPlan, setShowNewMealPlan] = useState(false);
   const [mealPreview, setMealPreview] = useState([]);
-  const [recipe, setRecipe] = useState([]);
   const [grocery, setGrocery] = useState([]);
   const [groceryPreview, setGroceryPreview] = useState([]);
   const [isGroceryLoading, setIsGroceryLoading] = useState(true);
@@ -67,9 +70,21 @@ export default function Dashboard() {
       if (response.ok) {
         const data = await response.json();
 
+        const currentMealIds = data.selectedMeals
+        .map(meal => meal.id)
+        .sort()
+        .join(',');
+
+    // Check if meals actually changed (and it's not the first load)
+    if (previousMealIdsRef.current !== null && 
+      previousMealIdsRef.current !== currentMealIds) {
+        setShowNewMealPlan(true); // Show the showcase component
+    }
+
+    previousMealIdsRef.current = currentMealIds;
+  
         // Unpack the consolidated response
         setMeals(data.selectedMeals);
-        setRecipe(data.selectedMeals);
         setMealPreview(data.randomMeals);
         setGrocery(data.groceryList);
         setGroceryPreview(data.groceryList.slice(0, 3));
@@ -77,7 +92,6 @@ export default function Dashboard() {
         console.error("Failed to load dashboard data:", response.status);
 
         setMeals([]);
-        setRecipe([]);
         setMealPreview([]);
         setGrocery([]);
         setGroceryPreview([]);
@@ -85,7 +99,6 @@ export default function Dashboard() {
     } catch (error) {
       console.error("Error loading dashboard data:", error);
       setMeals([]);
-      setRecipe([]);
       setMealPreview([]);
       setGrocery([]);
       setGroceryPreview([]);
@@ -110,7 +123,7 @@ export default function Dashboard() {
 
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-black">
+    <div className="min-h-screen bg-gray-100">
       <Nav
         isNavVisible={isNavVisible}
         setIsNavVisible={setIsNavVisible}
@@ -121,6 +134,7 @@ export default function Dashboard() {
 
 
       <main className={`p-8 transition-all duration-300 ${isNavVisible ? 'ml-60' : 'ml-52'}`}>
+        {showNewMealPlan && (<NewMealPlanShowcase meals={meals} onClose={() => setShowNewMealPlan(false)} />)} 
         {showOnboarding && <OnboardingCard setShowOnboarding={setShowOnboarding} />}
         {showSettings && <Settings setShowSettings={setShowSettings} setShowPreferences={setShowPreferences} />}
         {showPreferences && <SettingsOnboard setShowPreferences={setShowPreferences} />}
