@@ -429,40 +429,10 @@ public class MealPlanService {
         log.info("Generating meal plan: need {}, have {}, available from history: {}",
                 req, list.size(), allMeals.size());
 
-        if (allMeals != null && !allMeals.isEmpty()) {
-            for (Recipe recipe : allMeals) {
-                if (list.size() >= req) break;
-                if (list.contains(recipe)) continue;
 
-                if (recipe.getCalories() >= min - 120 && recipe.getCalories() <= min + 120) {
-                    list.add(recipe);
-                    log.info("Added from history: {}", recipe.getName());
-                }
-            }
-        }
-
-        if (list.size() < req && recipieList != null) {
-            for (Recipe recipe : recipieList) {
-                if (list.size() >= req) break;
-
-                if (!list.contains(recipe) &&
-                        recipe.getCalories() >= min - 120 &&
-                        recipe.getCalories() <= min + 120) {
-                    list.add(recipe);
-                    log.info("Added from local list: {}", recipe.getName());
-                }
-            }
-        }
-
-        if (list.size() < req) {
-            List<Recipe> dbRecipes = recipeRepository.findByCaloriesBetween(min - 120, min + 120);
-            for (Recipe recipe : dbRecipes) {
-                if (list.size() >= req) break;
-                if (!list.contains(recipe)) {
-                    list.add(recipe);
-
-                }
-            }
+        if (!allMeals.isEmpty()) {
+            //fetch meals in plan, in memory or db
+            fetchAllMeals(allMeals, list, req, min);
         }
 
         int totalCalories = list.stream().mapToInt(Recipe::getCalories).sum();
@@ -470,7 +440,7 @@ public class MealPlanService {
         if (totalCalories < calorie) {
             int gap = calorie - totalCalories;
 
-            // Try existing plan first
+            // Try to find a recipe to fill the calorie gap in memory or from list
             Recipe closestRecipe = null;
             if (existingPlan != null) {
                 closestRecipe = allMeals.stream()
@@ -498,6 +468,48 @@ public class MealPlanService {
 
         return list;
     }
+
+    private List<Recipe> fetchAllMeals(List<Recipe> allMeals, List<Recipe> list, int req, int min) {
+        for (Recipe recipe : allMeals) {
+            if (list.size() >= req) break;
+            if (list.contains(recipe)) continue;
+
+            if (recipe.getCalories() >= min - 120 && recipe.getCalories() <= min + 120) {
+                list.add(recipe);
+                log.info("Added from history: {}", recipe.getName());
+            }
+        }
+
+
+        //secondary fetch in-memory to find recipes
+        if (list.size() < req && recipieList != null) {
+            for (Recipe recipe : recipieList) {
+                if (list.size() >= req) break;
+
+                if (!list.contains(recipe) &&
+                        recipe.getCalories() >= min - 120 &&
+                        recipe.getCalories() <= min + 120) {
+                    list.add(recipe);
+                    log.info("Added from local list: {}", recipe.getName());
+                }
+            }
+        }
+
+        if (list.size() < req) {
+            List<Recipe> dbRecipes = recipeRepository.findByCaloriesBetween(min - 120, min + 120);
+            for (Recipe recipe : dbRecipes) {
+                if (list.size() >= req) break;
+                if (!list.contains(recipe)) {
+                    list.add(recipe);
+
+                }
+
+            }
+        }
+        return list;
+    }
+
+
 
     public List<Recipe> selectMeals(@AuthenticationPrincipal UserDetails userDetails) {
         String email = userDetails.getUsername();
@@ -531,6 +543,7 @@ public class MealPlanService {
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
 
+            //secondary fetch to get meals marked as planned
             if (subList.isEmpty()) {
                 subList = recipeRepository.findMarkedRecipesByUserId(user.getId());
                 log.info("Sub list size after db: {}", subList.size());
@@ -543,10 +556,16 @@ public class MealPlanService {
             if (allPlannedMealsEaten) {
                 log.info("All planned meals eaten. Unmarking and generating new plan...");
 
-                plannedMeals.forEach(mealPlan -> mealPlan.setPlanned(false));
-                subList.clear();
+                updateUserPlan(existingPlan, plannedMeals);
 
-                subList = generateSubRecipeList(req, calorie, existingPlan, new ArrayList<>());
+                user.setMealPlans(existingPlan);
+                userRepository.save(user);
+                log.info("Saved user with unmarked meal plans");
+
+                subList.clear();
+                existingPlan = new ArrayList<>(user.getMealPlans());
+
+                subList = generateSubRecipeList(req, calorie, existingPlan, subList);
 
 
             } else if (subList.size() == req || subList.size() == req + 1) {
@@ -562,8 +581,27 @@ public class MealPlanService {
             subList = generateSubRecipeList(req, calorie, existingPlan, subList);
         }
 
-        savePlannedMeals(subList, existingPlan, user);
+        subList = savePlannedMeals(subList, existingPlan, user);
         return (subList);
+    }
+
+    private void updateUserPlan(List<UserMealPlan> existingPlan, List<UserMealPlan> plannedMeals) {
+        Set<Long> plannedRecipeIds = plannedMeals.stream()
+                .map(UserMealPlan::getRecipe)
+                .filter(Objects::nonNull)
+                .map(Recipe::getId)
+                .collect(Collectors.toSet());
+
+        // Find and update the matching UserMealPlans in existingPlan with new meals marked
+        existingPlan.stream()
+                .filter(mp -> mp.getRecipe() != null)
+                .filter(mp -> plannedRecipeIds.contains(mp.getRecipe().getId()))
+                .forEach(mp -> {
+                    mp.setPlanned(false);
+                    mp.setEaten(true);
+                    log.info("Unmarked meal plan for recipe: {}", mp.getRecipe().getName());
+                });
+
     }
 
     private List<Recipe> savePlannedMeals(List<Recipe> subList, List<UserMealPlan> existingPlan, User user) {

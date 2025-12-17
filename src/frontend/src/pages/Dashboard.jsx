@@ -20,7 +20,8 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [showOnboarding, setShowOnboarding] = useState(
     () =>
-      localStorage.getItem("onboarding") === "true"
+
+      localStorage.getItem("onboarding") === "false"
   );
 
   const [isNavVisible, setIsNavVisible] = useState(false);
@@ -36,19 +37,20 @@ export default function Dashboard() {
   const [progress, setProgress] = useState(40);
   const [groupSize, setGroupSize] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
-
   const [shouldNavigate, setShouldNavigate] = useState(false);
-
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/');
   };
 
-
   useEffect(() => {
-    loadDashboardData();
-  }, []);
-
+  // Load the previous meal names from localStorage on mount
+  const stored = localStorage.getItem('previousMealNames');
+  if (stored) {
+    previousMealIdsRef.current = stored;
+  }
+  loadDashboardData();
+}, []);
 
   useEffect(() => {
     if (shouldNavigate && grocery) {
@@ -70,20 +72,22 @@ export default function Dashboard() {
       if (response.ok) {
         const data = await response.json();
 
-        const currentMealIds = data.selectedMeals
-        .map(meal => meal.id)
+        const currentMealNames = data.selectedMeals
+        .map(meal => meal.name)
         .sort()
-        .join(',');
+        .join('|');
+      
+      //check if the meals changed
+        if (previousMealIdsRef.current !== null) {
+          const hasDifference = previousMealIdsRef.current !== currentMealNames;  
+          if (hasDifference) {
+            setShowNewMealPlan(true);
+          }
 
-    // Check if meals actually changed (and it's not the first load)
-    if (previousMealIdsRef.current !== null && 
-      previousMealIdsRef.current !== currentMealIds) {
-        setShowNewMealPlan(true); // Show the showcase component
-    }
-
-    previousMealIdsRef.current = currentMealIds;
-  
-        // Unpack the consolidated response
+        // Store new ref and meals names
+        previousMealIdsRef.current = currentMealNames;
+        localStorage.setItem('previousMealNames', currentMealNames);
+        
         setMeals(data.selectedMeals);
         setMealPreview(data.randomMeals);
         setGrocery(data.groceryList);
@@ -96,7 +100,8 @@ export default function Dashboard() {
         setGrocery([]);
         setGroceryPreview([]);
       }
-    } catch (error) {
+    } 
+  }catch (error) {
       console.error("Error loading dashboard data:", error);
       setMeals([]);
       setMealPreview([]);
@@ -104,8 +109,6 @@ export default function Dashboard() {
       setGroceryPreview([]);
     }
   };
-
-
 
   const handleRecipeClick = (recipeName) => {
     navigate("/recipe", { state: { name: recipeName } });
@@ -120,8 +123,6 @@ export default function Dashboard() {
     }
   };
 
-
-
   return (
     <div className="min-h-screen bg-gray-100">
       <Nav
@@ -131,7 +132,6 @@ export default function Dashboard() {
         handleLogout={handleLogout}
         progress={progress}
       />
-
 
       <main className={`p-8 transition-all duration-300 ${isNavVisible ? 'ml-60' : 'ml-52'}`}>
         {showNewMealPlan && (<NewMealPlanShowcase meals={meals} onClose={() => setShowNewMealPlan(false)} />)} 

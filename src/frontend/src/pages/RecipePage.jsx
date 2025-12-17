@@ -210,28 +210,6 @@ const RecipePage = () => {
             <div className="bg-white/20 backdrop-blur-md text-white px-6 py-3 rounded-xl shadow-lg">
               <div className="flex items-center gap-3">
                 <div className="relative w-12 h-12">
-                  <svg className="transform -rotate-90 w-12 h-12">
-                    <circle
-                      cx="24"
-                      cy="24"
-                      r="20"
-                      stroke="white"
-                      strokeWidth="4"
-                      fill="none"
-                      opacity="0.3"
-                    />
-                    <circle
-                      cx="24"
-                      cy="24"
-                      r="20"
-                      stroke="white"
-                      strokeWidth="4"
-                      fill="none"
-                      strokeDasharray={`${2 * Math.PI * 20}`}
-                      strokeDashoffset={`${2 * Math.PI * 20 * (1 - completionPercentage / 100)}`}
-                      className="transition-all duration-500"
-                    />
-                  </svg>
                   <div className="absolute inset-0 flex items-center justify-center text-sm font-bold">
                     {completionPercentage}%
                   </div>
@@ -336,9 +314,10 @@ const RecipePage = () => {
                       }`}
                       onClick={() => {
                         const newStepCompleted = [...stepCompleted];
+                        //add new step completed
                         newStepCompleted[index] = !newStepCompleted[index];
                         setStepCompleted(newStepCompleted);
-                        
+                        // if all steps completed, show poup
                         if (!stepCompleted[index] && newStepCompleted.filter(Boolean).length === steps.length) {
                           setShowPopup(true);
                           setTimeout(() => setShowPopup(false), 4000);
@@ -375,6 +354,7 @@ const RecipePage = () => {
                 {/* Complete All Button */}
                 {!allStepsCompleted && steps.length > 0 && (
                   <button
+                  //completes all steps and shows popups
                     onClick={() => {
                       setStepCompleted(steps.map(() => true));
                       setShowPopup(true);

@@ -35,9 +35,10 @@ const SettingsOnboard = ({ setShowPreferences }) => {
         body: JSON.stringify(formData),
       });
 
+      localStorage.removeItem("onboarding");
+
       if (res.ok) {
         const data = await res.json();
-        localStorage.removeItem("onboarding");
         console.table(data);
         alert("Preferences updated successfully!");
       } else {
