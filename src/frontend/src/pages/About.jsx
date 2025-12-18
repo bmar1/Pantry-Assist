@@ -12,7 +12,7 @@ const About = () => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen bg-[#f7f5f0] dark:bg-black">
+        <div className="flex flex-col min-h-screen bg-[#f7f5f0]">
             {/* Navigation Bar */}
             <nav className="bg-gradient-to-b from-[#618c45] to-[#5A7A4D] shadow-md px-4 sm:px-8 py-4 flex items-center justify-between">
                 {/* Left Side Group */}
@@ -111,11 +111,12 @@ const About = () => {
                     initial={{ opacity: 0, y: 50 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, amount: 0.3 }}
+
                     transition={{ duration: 0.8 }}
                     className="max-w-4xl mx-auto text-center mb-16"
                 >
                     <h2 className="text-4xl font-semibold text-[#5A7A4D] mb-4">Our Mission</h2>
-                    <p className="text-lg text-gray-700 dark:text-gray-300">
+                    <p className="text-lg text-gray-700">
                         At PantryAssist, our mission is to simplify your life by revolutionizing meal planning and pantry management. We believe that everyone deserves to eat well without the stress of wondering what to cook or wasting food. Our platform empowers you to save money, reduce food waste, and enjoy delicious, home-cooked meals with ease.
                     </p>
                 </motion.section>
@@ -132,10 +133,10 @@ const About = () => {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, amount: 0.2 }}
                             transition={{ duration: 0.5, delay: i * 0.2 }}
-                            className="p-6 rounded-2xl bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-white/40 dark:border-white/10 shadow-lg text-center"
+                            className="p-6 rounded-2xl bg-white/600 backdrop-blur-xl border border-white/40  shadow-lg text-center"
                         >
                             <h3 className="text-2xl font-semibold mb-2 text-[#5A7A4D]">{card.title}</h3>
-                            <p className="text-base text-gray-600 dark:text-gray-400">{card.desc}</p>
+                            <p className="text-base text-gray-600">{card.desc}</p>
                         </motion.div>
                     ))}
                 </div>
@@ -148,7 +149,7 @@ const About = () => {
                     className="max-w-4xl mx-auto text-center"
                 >
                     <h2 className="text-4xl font-semibold text-[#5A7A4D] mb-4">Our Story</h2>
-                    <p className="text-lg text-gray-700 dark:text-gray-300">
+                    <p className="text-lg text-gray-700">
                         Founded by a team of passionate foodies and tech enthusiasts, PantryAssist was born from a simple idea: to make meal planning effortless and accessible for everyone. We were tired of the daily struggle of deciding what to eat and the guilt of wasting forgotten ingredients. We knew there had to be a better way, and so, PantryAssist was created.
                     </p>
                 </motion.section>

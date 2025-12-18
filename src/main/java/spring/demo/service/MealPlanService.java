@@ -694,16 +694,5 @@ public class MealPlanService {
 
 
 
-    public List<Ingredient> groceryList(@AuthenticationPrincipal UserDetails userDetails) {
-        String email = userDetails.getUsername();
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-        List<Ingredient> ingredients = user.getGroceryList().stream()
-                .map(UserIngredient::getIngredient)
-                .toList();
-
-        return ingredients;
-    }
 }

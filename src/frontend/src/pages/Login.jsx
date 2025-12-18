@@ -32,14 +32,12 @@ export default function AuthForm() {
     if (res.ok) {
       const data = await res.json();
       localStorage.setItem("token", data.token);
-      if (isLogin) {
-        navigate("/dashboard");
-      }
-      else {
-        navigate("/dashboard");
+      localStorage.setItem("email", email);
+ 
+      if(!isLogin) {
         localStorage.setItem("onboarding", true);
-        localStorage.setItem("email", email);
       }
+      navigate("/dashboard");
       setPasswordError(false);
       {/* If any error occurs, from status, change error */ }
     } else if (isLogin && res.status === 403) {

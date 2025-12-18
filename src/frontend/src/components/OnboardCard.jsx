@@ -29,14 +29,9 @@ const OnboardingCard = ({ setShowOnboarding }) => {
   const handleBack = () => setStep((prev) => Math.max(prev - 1, 0));
 
   const handleSubmit = async () => {
-    // The timeout provides a brief moment for the user to see the confirmation
-    // before navigating to the loading screen.
     setTimeout(() => {
       navigate("/LoadingScreen");
     }, 300);
-
-    // Hide onboarding after submission
-    setShowOnboarding(false);
 
     try {
       const res = await fetch("http://localhost:8080/api/onboarding", {
@@ -47,10 +42,11 @@ const OnboardingCard = ({ setShowOnboarding }) => {
         },
         body: JSON.stringify(formData),
       });
-
+      setShowOnboarding(false);
+      localStorage.removeItem("onboarding");
       if (res.ok) {
         const data = await res.json();
-        localStorage.removeItem("onboarding");
+       
         console.table(data);
         alert("Onboarding data submitted successfully!");
       } else {

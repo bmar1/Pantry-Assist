@@ -63,7 +63,7 @@ export default function AllMeals() {
             {showPreferences && <SettingsOnboard setShowPreferences={setShowPreferences} />}
 
             <main className={`p-8 transition-all duration-300 ${isNavVisible ? 'ml-60' : 'ml-20'}`}>
-    <h1 className="text-4xl font-bold text-center mb-10 text-gray-800">All Meals</h1>
+            <h1 className="text-4xl font-bold text-center mb-10 text-gray-800">All Meals</h1>
     
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {meals.map((meal) => (

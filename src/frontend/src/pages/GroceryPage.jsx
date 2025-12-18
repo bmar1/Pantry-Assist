@@ -10,6 +10,46 @@ const GroceryListPage = () => {
     const [isLoading, setIsLoading] = useState(() => !location.state?.grocery);
 
     useEffect(() => {
+  const loadGrocery = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`http://localhost:8080/api/meals/groceryList`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+    
+        const seenNames = new Set();
+        const uniqueList = data.filter((item) => {
+          const isDuplicate = seenNames.has(item.name);
+          seenNames.add(item.name);
+          return !isDuplicate;
+        });
+        
+        setGroceryList(uniqueList);
+      } else {
+        console.error("Failed to load grocery list:", response.status);
+        setGroceryList([]);
+      }
+    } catch (error) {
+      console.error("Error loading grocery list:", error);
+      setGroceryList([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!location.state?.grocery && (!groceryList || groceryList.length === 0)) {
+    loadGrocery();
+  }
+}, [location.state?.grocery]); 
+
+    useEffect(() => {
     // Only run if the raw list exists and has items
     if (groceryList && groceryList.length > 0) {
       
@@ -26,6 +66,8 @@ const GroceryListPage = () => {
       setGroceryList(uniqueList);
     }
   }, []);
+
+  
 
     // Loading state while fetching data.
     if (isLoading) {

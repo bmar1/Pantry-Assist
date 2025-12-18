@@ -12,7 +12,6 @@ const NewMealPlanShowcase = ({ meals, onClose}) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full p-8 relative">
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-6 right-6 text-gray-400 hover:text-gray-700 transition-all hover:rotate-90 duration-300"
@@ -56,44 +55,23 @@ const NewMealPlanShowcase = ({ meals, onClose}) => {
             >
               {/* Image Container */}
               <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
-                {meal.thumbnail ? (
                   <img 
                     src={meal.thumbnail} 
                     alt={meal.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <svg 
-                      className="w-20 h-20 text-gray-300" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24"
-                    >
-                      <path 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        strokeWidth={1.5} 
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" 
-                      />
-                    </svg>
-                  </div>
-                )}
-                
-                {/* Overlay Badge */}
+        
+                {/* meal number badge */}
                 <div className="absolute top-3 right-3 bg-[#6d9851] text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
                   #{index + 1}
                 </div>
               </div>
 
-              {/* Content */}
               <div className="p-5">
-                {/* Meal Name */}
                 <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-[#6d9851] transition-colors line-clamp-2">
                   {meal.name}
                 </h3>
 
-                {/* Info Grid */}
                 <div className="flex items-center gap-2 pl-4text-sm mb-3">
                   {meal.calories && (
                     <div className="flex items-center text-gray-600">
@@ -106,12 +84,7 @@ const NewMealPlanShowcase = ({ meals, onClose}) => {
                     {meal.category}
                   </div>
                 )}
-                  
-                  
                 </div>
-
-                {/* Category Tag */}
-                
 
                 {/* View Recipe Arrow */}
                 <div className="mt-4 flex items-center text-[#6d9851] font-semibold text-sm group-hover:translate-x-1 transition-transform">
@@ -135,7 +108,7 @@ const NewMealPlanShowcase = ({ meals, onClose}) => {
           ))}
         </div>
 
-        {/* Footer CTA */}
+        {/* footer */}
         <div className="mt-8 text-center">
           <button
             onClick={onClose}

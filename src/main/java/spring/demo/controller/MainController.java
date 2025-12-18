@@ -107,7 +107,7 @@ public class MainController {
     public ResponseEntity<DashboardData> loadDashBboard(@AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
         List<Recipe> selectedMeals = mealPlanService.selectMeals(userDetails);
         List<Recipe> randomMeals = mealPlanService.random(userDetails);
-        List<Ingredient> groceryList = mealPlanService.groceryList(userDetails);
+        List<Ingredient> groceryList = groceryList(userDetails);
 
         DashboardData data = new DashboardData(selectedMeals, randomMeals, groceryList);
         return ResponseEntity.ok(data);
@@ -218,5 +218,18 @@ public class MainController {
         }
 
         return ResponseEntity.ok(recipe.get());
+    }
+    @GetMapping("/meals/groceryList")
+    public List<Ingredient> groceryList(@AuthenticationPrincipal UserDetails userDetails) {
+        String email = userDetails.getUsername();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        List<Ingredient> ingredients = user.getGroceryList().stream()
+                .map(UserIngredient::getIngredient)
+                .toList();
+
+        return ingredients;
     }
 }

@@ -14,8 +14,7 @@ const RecipePage = () => {
     const [showPopup, setShowPopup] = useState(false);
     const [mealEaten, setMealEaten] = useState(false);
 
-
-
+    //updates backend to mark meal as eaten
     const markMealAsEaten = async () => {
         try {
             const token = localStorage.getItem("token");
@@ -31,7 +30,6 @@ const RecipePage = () => {
                 },
             });
 
-
             if (response.ok) {
                 console.log(`Meal '${name}' marked as eaten.`);
             } else {
@@ -44,8 +42,7 @@ const RecipePage = () => {
 
     const handleBack = () => {
     navigate('/dashboard');
-  };
-
+    };
 
     useEffect(() => {
         const loadMeal = async () => {
@@ -82,6 +79,7 @@ const RecipePage = () => {
         loadMeal();
     }, [name]);
 
+    //memoize the steps and filter based on new line for each new step
     const steps = useMemo(() => {
         if (!recipe?.instructions) return [];
         return recipe.instructions
@@ -91,6 +89,7 @@ const RecipePage = () => {
             .filter(step => step.trim() !== '');
     }, [recipe?.instructions]);
 
+    //update completion based on steps completed 
       const completionPercentage = steps.length > 0 
     ? Math.round((stepCompleted.filter(Boolean).length / steps.length) * 100)
     : 0;
@@ -118,7 +117,6 @@ const RecipePage = () => {
                     setShowPopup(false);
                 }, 4000);
 
-                // Cleanup timeout if component unmounts
                 return () => clearTimeout(timer);
             }
         }
@@ -138,8 +136,6 @@ const RecipePage = () => {
 
         markMeal();
     }, [mealEaten, name]);
-
-
 
     // Convert YouTube URL to embed format
     const getYouTubeEmbedUrl = (url) => {
@@ -182,11 +178,8 @@ const RecipePage = () => {
     <div className="min-h-screen bg-gradient-to-br from-[#6d9851] via-[#5A7A4D] to-[#4a6340] flex justify-center items-start">
       {/* Success Popup */}
       {showPopup && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#6d9851] to-[#5A7A4D] text-white px-8 py-4 rounded-xl shadow-2xl z-50 animate-bounce">
+        <div className="mr-15 fixed bottom-8 left-1/2 -translate-x-1/2 bg-gradient-to-r from-[#6d9851] to-[#5A7A4D] text-white px-8 py-4 rounded-xl shadow-2xl z-50 animate-bounce">
           <div className="flex items-center gap-3">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
             <p className="font-semibold">Congratulations on completing your meal!</p>
           </div>
         </div>
@@ -199,13 +192,10 @@ const RecipePage = () => {
             onClick={handleBack}
             className="flex items-center gap-2 px-6 py-3 bg-white/20 backdrop-blur-md text-white rounded-xl hover:bg-white/30 transition-all duration-300 shadow-lg hover:shadow-xl"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            <span className="font-semibold">Back to Dashboard</span>
+          <span className="font-semibold">Back to Dashboard</span>
           </button>
 
-          {/* Progress Badge */}
+          {/* display badge and percentage */}
           {steps.length > 0 && (
             <div className="bg-white/20 backdrop-blur-md text-white px-6 py-3 rounded-xl shadow-lg">
               <div className="flex items-center gap-3">
@@ -380,29 +370,11 @@ const RecipePage = () => {
                     <iframe
                       src={embedUrl}
                       title="YouTube video player"
-                      frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                       className="w-full h-full"
                     ></iframe>
                   </div>
-                </div>
-              </div>
-            )}
-
-            {/* Tags */}
-            {recipe.tags && (
-              <div className="mt-12">
-                <h2 className="text-2xl font-bold mb-4 text-gray-800">Tags</h2>
-                <div className="flex flex-wrap gap-3">
-                  {recipe.tags.split(',').map((tag, index) => (
-                    <span
-                      key={index}
-                      className="px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 text-[#5A7A4D] rounded-full text-sm font-semibold border-2 border-green-200 hover:shadow-md transition-shadow"
-                    >
-                      #{tag.trim()}
-                    </span>
-                  ))}
                 </div>
               </div>
             )}
