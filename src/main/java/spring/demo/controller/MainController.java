@@ -113,7 +113,7 @@ public class MainController {
         return ResponseEntity.ok(data);
     }
 
-
+    //updates a list of user preferences (calories, meals and goals)
     @PostMapping("/user/updatePref")
     public ResponseEntity<?> updatePref(@RequestBody UserPreference pref, @AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
         String email = userDetails.getUsername();

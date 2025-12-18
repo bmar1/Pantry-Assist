@@ -12,7 +12,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
-
+    // define routes under router, wrapping with protected routes which fall-back if invalid token/status
       <Router>
         <Routes>
           <Route path="/" element={<Navigate to="/landing" replace />} />

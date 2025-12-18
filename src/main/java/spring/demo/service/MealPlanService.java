@@ -1,5 +1,6 @@
 /*
-This services provides a list of methods to use regarding meal and ingredient data regarding a user, aimed at designing a new meal plan, calculating meals and etc
+This services provides a list of methods to use regarding meal and ingredient data regarding a user,
+aimed at designing a new meal plan, calculating meals and etc
  */
 
 package spring.demo.service;
@@ -94,6 +95,7 @@ public class MealPlanService {
         return filtered;
     }
 
+    //returns a meal cost of a function by calcualting ingredient cost
     private double getMealCost(Recipe recipe) throws Exception {
         double mealCost = 0.0;
         Set<String> processedIngredients = new HashSet<>();
@@ -162,11 +164,11 @@ public class MealPlanService {
             return Optional.of(dbIng);
         }
 
-        // Cache expired - refresh from API
+        // Cache expired - refresh from db
         return refreshIngredientFromAPI(dbIng, ingName, query);
     }
 
-    // Refresh expired ingredient from API
+    // Refresh expired ingredient from db
     private Optional<Ingredient> refreshIngredientFromAPI(Ingredient dbIng, String ingName, String query) {
         try {
             Ingredient fresh = priceService.getIngredient(ingName);
@@ -187,7 +189,7 @@ public class MealPlanService {
         return Optional.empty();
     }
 
-    // Fetch new ingredient from API
+    // Fetch new ingredient from db
     private Optional<Ingredient> fetchNewIngredient(String ingName, String query) {
         try {
             Ingredient fresh = priceService.getIngredient(ingName);
@@ -366,7 +368,7 @@ public class MealPlanService {
         return filtered;
     }
 
-
+    //Filters recipes based on min shared
     public ArrayList<Recipe> filterByCommonIngredientsOptimized(List<Recipe> recipes, int minShared) {
         // Map each ingredient to the set of recipes that contain it
         Map<String, Set<Recipe>> ingredientMap = new HashMap<>();
@@ -411,7 +413,7 @@ public class MealPlanService {
         return (ArrayList<Recipe>) filtered;
     }
 
-    //Find all user meals and generate new recipe list based off requirements
+    //Find all user meals and generate new recipe list based off requirements of calories and existing recipes
     public List<Recipe> generateSubRecipeList(int req, int calorie, List<UserMealPlan> existingPlan, List<Recipe> alreadySelected) {
         List<Recipe> allMeals = existingPlan.stream()
                 .filter(Objects::nonNull)
@@ -510,7 +512,7 @@ public class MealPlanService {
     }
 
 
-
+    //Selects a required amount of meals for the user's new meal plan of the day, opts out for early returns where able
     public List<Recipe> selectMeals(@AuthenticationPrincipal UserDetails userDetails) {
         String email = userDetails.getUsername();
         User user = userRepository.findByEmail(email)
@@ -585,6 +587,7 @@ public class MealPlanService {
         return (subList);
     }
 
+    // Find and update the matching UserMealPlans in existingPlan with new meals marked
     private void updateUserPlan(List<UserMealPlan> existingPlan, List<UserMealPlan> plannedMeals) {
         Set<Long> plannedRecipeIds = plannedMeals.stream()
                 .map(UserMealPlan::getRecipe)
@@ -592,7 +595,6 @@ public class MealPlanService {
                 .map(Recipe::getId)
                 .collect(Collectors.toSet());
 
-        // Find and update the matching UserMealPlans in existingPlan with new meals marked
         existingPlan.stream()
                 .filter(mp -> mp.getRecipe() != null)
                 .filter(mp -> plannedRecipeIds.contains(mp.getRecipe().getId()))
@@ -603,7 +605,7 @@ public class MealPlanService {
                 });
 
     }
-
+    //saves a list of planned meals and modifies it
     private List<Recipe> savePlannedMeals(List<Recipe> subList, List<UserMealPlan> existingPlan, User user) {
         // Save new planned meals
         for (Recipe recipe : subList) {
@@ -643,6 +645,7 @@ public class MealPlanService {
         return subList;
     }
 
+    //Finds and save's recipe meal plans
     public void findAndSaveMealPlan(User user) {
         for (Recipe recipe : recipieList) {
             // Add to meal plan
@@ -665,21 +668,23 @@ public class MealPlanService {
         }
     }
 
+    //Removes all duplicate meal plans from a specified user meal plan
     public void removeDuplicates(User user, List<UserMealPlan> existingPlan) {
         Set<Long> existingPlanRecipeIds = existingPlan.stream()
-                .filter(Objects::nonNull) // Check meal plan is not null
-                .filter(plan -> plan.getRecipe() != null) // Check recipe is not null
+                .filter(Objects::nonNull)
+                .filter(plan -> plan.getRecipe() != null)
                 .map(plan -> plan.getRecipe().getId())
                 .collect(Collectors.toSet());
 
         user.getMealPlans().removeIf(plan ->
-                plan != null && // Check plan is not null
-                        plan.getRecipe() != null && // Check recipe is not null
+                plan != null &&
+                        plan.getRecipe() != null &&
                         existingPlanRecipeIds.contains(plan.getRecipe().getId()) &&
                         !plan.isPlanned()
         );
     }
 
+    //Returns a random meal from a query
     public List<Recipe> random(@AuthenticationPrincipal UserDetails userDetails) {
         String email = userDetails.getUsername();
 

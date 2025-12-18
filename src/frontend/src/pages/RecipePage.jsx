@@ -1,4 +1,9 @@
-// RecipePage.js
+/**
+ * @file Recipepage.jsx
+ * @description This page/component handles the main responsive design towards: 
+ * planning & cooking meals, eating meals and updating meals, 
+ * it incorporates the list, a helpful guide, and steps laid out upon completion, giving a message.
+ */
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";

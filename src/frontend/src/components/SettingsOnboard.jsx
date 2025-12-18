@@ -70,8 +70,6 @@ const SettingsOnboard = ({ setShowPreferences }) => {
           Help us get to know you!
         </h1>
 
-    
-
         {/* Calories */}
         <div className="mb-6">
           <h2 className="text-lg font-bold mb-2">Daily Calorie Intake</h2>

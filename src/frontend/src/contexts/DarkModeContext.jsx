@@ -4,6 +4,8 @@
  * for managing the application's dark mode theme. It persists the user's
  * preference in localStorage and applies the appropriate CSS class to the
  * root HTML element to toggle the theme.
+ * 
+ * UN-USED FOR NOW.
  */
 
 import { createContext, useState, useEffect, useContext } from "react";
