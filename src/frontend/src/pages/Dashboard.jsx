@@ -15,6 +15,7 @@ import Settings from "../components/Settings";
 import SettingsOnboard from "../components/SettingsOnboard";
 import Nav from "../components/Navbar";
 import NewMealPlanShowcase from '../components/NewMealShowcase';
+import LoadingScreen from './LoadingScreen';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -29,12 +30,12 @@ export default function Dashboard() {
   const [showNewMealPlan, setShowNewMealPlan] = useState(false);
   const [mealPreview, setMealPreview] = useState([]);
   const [grocery, setGrocery] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [groceryPreview, setGroceryPreview] = useState([]);
   const [isGroceryLoading, setIsGroceryLoading] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
   const [progress, setProgress] = useState(40);
-  const [groupSize, setGroupSize] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shouldNavigate, setShouldNavigate] = useState(false);
   const handleLogout = () => {
@@ -55,6 +56,7 @@ export default function Dashboard() {
     }
   };
 
+
   useEffect(() => {
   // Load the previous meal names from localStorage on mount
   const stored = localStorage.getItem('previousMealNames');
@@ -74,65 +76,70 @@ export default function Dashboard() {
 
   //loads all relevant data to page
   const loadDashboardData = async () => {
+     setIsLoading(true);
     try {
-      const response = await fetch(`http://localhost:8080/api/dashboard/load`, {
+      const response = await fetch(`/api/load`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${localStorage.getItem("token")}`,
         },
       });
+        if(!response.ok){
+          console.error("Failed to load dashboard data:", response.status);
+          setMeals([]);
+          setMealPreview([]);
+          setGrocery([]);
+          setGroceryPreview([]);
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+    const data = await response.json();
+    const currentMealNames = data.selectedMeals
+      .map(meal => meal.name)
+      .sort()
+      .join('|');
 
-      if (response.ok) {
-        const data = await response.json();
-
-        //checks if to display popup based on new meals
-        const currentMealNames = data.selectedMeals
-        .map(meal => meal.name)
-        .sort()
-        .join('|');
-      
-        if (previousMealIdsRef.current !== null) {
-          const hasDifference = previousMealIdsRef.current !== currentMealNames;  
-          if (hasDifference) {
-            setShowNewMealPlan(true);
-          }
-
-        // Store new ref and meals names
-        previousMealIdsRef.current = currentMealNames;
-        localStorage.setItem('previousMealNames', currentMealNames);
-      
-        setMeals(data.selectedMeals);
-        setMealPreview(data.randomMeals);
-        const seenNames = new Set();
-        const uniqueList = data.groceryList.filter((item) => {
-          const isDuplicate = seenNames.has(item.name);
-          seenNames.add(item.name);
-          return !isDuplicate;
-        });
-        setGrocery(uniqueList);
-        setIsGroceryLoading(false);
-        setGroceryPreview(data.groceryList.slice(0, 3));
-      } else {
-        console.error("Failed to load dashboard data:", response.status);
-        setMeals([]);
-        setMealPreview([]);
-        setGrocery([]);
-        setGroceryPreview([]);
+    if (previousMealIdsRef.current !== null) {
+      const hasDifference = previousMealIdsRef.current !== currentMealNames;  
+      if (hasDifference) {
+        setShowNewMealPlan(true);
       }
-    } 
-  }catch (error) {
+    }
+
+    previousMealIdsRef.current = currentMealNames;
+    localStorage.setItem('previousMealNames', currentMealNames);
+
+    setMeals(data.selectedMeals);
+    setMealPreview(data.randomMeals);
+    const seenNames = new Set();
+    const uniqueList = data.groceryList.filter((item) => {
+      const isDuplicate = seenNames.has(item.name);
+      seenNames.add(item.name);
+      return !isDuplicate;
+    });
+    setGrocery(uniqueList);
+    setIsGroceryLoading(false);
+    setGroceryPreview(data.groceryList.slice(0, 3));
+
+    } catch (error) {
       console.error("Error loading dashboard data:", error);
       setMeals([]);
       setMealPreview([]);
       setGrocery([]);
       setGroceryPreview([]);
+  }finally {
+      // Keep loading screen for minimum time
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 5500); 
     }
-  };
+};
 
   return (
+    
     <div className="min-h-screen bg-gray-100">
           {/* display components on top*/}
+      {isLoading && <LoadingScreen />}
       <Nav
         isNavVisible={isNavVisible}
         setIsNavVisible={setIsNavVisible}
@@ -146,9 +153,10 @@ export default function Dashboard() {
         {showOnboarding && <OnboardingCard setShowOnboarding={setShowOnboarding} />}
         {showSettings && <Settings setShowSettings={setShowSettings} setShowPreferences={setShowPreferences} />}
         {showPreferences && <SettingsOnboard setShowPreferences={setShowPreferences} />}
-
         
-  <div className="flex flex-col lg:flex-row gap-8 mt-5 max-w-7xl mx-auto">
+       
+
+  <div className={`flex flex-col lg:flex-row gap-8 mt-5 max-w-7xl mx-auto`}>
     
     {/* Main Suggestion Card */}
     <div className="mr-24 relative overflow-hidden bg-white border border-gray-100 p-10 rounded-[2.5rem] shadow-sm hover:shadow-xl transition-all duration-500 h-[650px] flex flex-col w-full lg:w-2/3">

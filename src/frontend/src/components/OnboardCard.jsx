@@ -10,10 +10,10 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
-const OnboardingCard = ({ setShowOnboarding }) => {
+const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
   const navigate = useNavigate();
-
   const [step, setStep] = useState(0);
+  const[loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     calories: 2000,
     budget: 50,
@@ -29,12 +29,10 @@ const OnboardingCard = ({ setShowOnboarding }) => {
   const handleBack = () => setStep((prev) => Math.max(prev - 1, 0));
 
   const handleSubmit = async () => {
-    setTimeout(() => {
-      navigate("/LoadingScreen");
-    }, 300);
+    setShowLoading(true);
 
     try {
-      const res = await fetch("http://localhost:8080/api/onboarding", {
+      const res = await fetch("/api/onboarding", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -43,10 +41,15 @@ const OnboardingCard = ({ setShowOnboarding }) => {
         body: JSON.stringify(formData),
       });
       setShowOnboarding(false);
+      
+      setTimeout(() => {
+        setShowLoading(false);
+      }, 5500); 
+    
       localStorage.removeItem("onboarding");
       if (res.ok) {
         const data = await res.json();
-       
+        
         console.table(data);
         alert("Onboarding data submitted successfully!");
       } else {

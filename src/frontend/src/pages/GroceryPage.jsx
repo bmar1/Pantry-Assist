@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import LoadingScreen from './LoadingScreen';
 
 const GroceryListPage = () => {
     const navigate = useNavigate();
@@ -10,10 +11,16 @@ const GroceryListPage = () => {
     const [isLoading, setIsLoading] = useState(() => !location.state?.grocery);
 
     useEffect(() => {
-  const loadGrocery = async () => {
-    setIsLoading(true);
+      if (meals === null || grocery === null) {
+      navigate("/LoadingScreen", { state: { page: "dashboard" } });
+    }
+    }, [meals, grocery, navigate]);
+
+    useEffect(() => {
+    const loadGrocery = async () => {
+      setIsLoading(true);
     try {
-      const response = await fetch(`http://localhost:8080/api/meals/groceryList`, {
+      const response = await fetch(`/api/meals/groceryList`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -69,14 +76,6 @@ const GroceryListPage = () => {
 
   
 
-    // Loading state while fetching data.
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-gradient-to-b from-[#6d9851] to-[#5A7A4D] flex justify-center items-center">
-                <p className="text-white text-xl">Loading your grocery list...</p>
-            </div>
-        );
-    }
 
     // Handle case where no grocery data is available after trying to load.
     if (!groceryList || groceryList.length === 0) {
@@ -99,7 +98,9 @@ const GroceryListPage = () => {
     const totalPrice = groceryList.reduce((sum, item) => sum + (item.totalPrice || 0), 0);
 
     return (
+    
         <div className="min-h-screen bg-gradient-to-b from-[#6d9851] to-[#5A7A4D] flex justify-center items-start p-4 sm:p-6 md:p-8">
+               {isLoading && <LoadingScreen />}
             <div className="max-w-4xl w-full bg-white rounded-2xl shadow-2xl p-6 sm:p-8 border border-transparent">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-6">

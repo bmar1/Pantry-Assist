@@ -4,8 +4,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true); // state to switch between login/signup
+  const location = useLocation()
   const navigate = useNavigate();
-  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -18,11 +18,8 @@ export default function AuthForm() {
     e.preventDefault();
 
     const endpoint = isLogin ? "login" : "signup";
-    const url = `http://localhost:8080/api/auth/${endpoint}`;
-
+    const url = `/api/auth/${endpoint}`;
     let res;
-
-
     res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const NewMealPlanShowcase = ({ meals, onClose}) => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const displayMeals = meals.slice(0, 3);
 
   const onMealClick = (recipeName) => {

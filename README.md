@@ -3,32 +3,57 @@ A full-stack application aimed to help you save food, tighten your budget, and p
 
 ---
 
-## 🎯 Objective
+## Demo Photos
+![Menu](./src/frontend/public/menu.png)
+![Cooking steps](./src/frontend/public/cooking.png)
+
+
+##  Objective
 This project aims to serve those who are on a budget or want help tracking what they eat — from calories to trying new foods — all in a way that’s easy to manage through the app, so you can spend more time doing what’s important to you! 💪🍽️
 
 ---
 
+## Getting started
+
+Currently, pantry assist is only hosted with the frontend, if you'd like to run this code locally, you need:
+- AWS RDS, EC2 instances
+- Pg Admin
+- API keys relevant
+
+  ### 💻 To run it locally:
+```bash
+git clone https://github.com/bmar1/Pantry-Assist.git
+npm install
+npm start
+```
+
 ## ⚙️ Features
 
-### 🛒 Grocery Tracking / Planning
+###  Grocery Tracking / Planning
 This application, based on your requirements and use cases, adapts to help you find interesting meals while providing grocery prices in your local area via Walmart’s data.
 
-### 🍱 Meal Planning  
+###  Meal Planning  
 Need help tracking how many calories you eat or what exactly you’re eating? Say no more! Pantry Assist easily tracks your weekly meals in a clean, organized format.
 
-### 🔐 Secure Login  
+###  Secure Login  
 Pantry Assist boasts secure, role-based access control throughout the app, enforcing security through JWT tokens.
+
+### Ease of use
+We offer an easy UI to navigate through to help you day-by-day to cook, and plan your meals!
+
+![Dashboard](./src/frontend/public/home.png)
 
 ---
 
 ## 🚀 Setup / Use
 
 ### 🌐 No need to worry!  
-Feel free to refer to the website (WIP) and use Pantry Assist directly from there.
+Feel free to refer to the website currently, hosting the frontend only, but soon full-stack via EC2:  
 
-### 💻 If you'd like to run it locally:
-```bash
-git clone https://github.com/bmar1/Pantry-Assist.git
-npm install
-npm start
-```
+https://pantry-assist.vercel.app/landing
+
+### Contributing
+
+If you'd like to contribute, reach out to me on any social media and lets' talk!
+
+

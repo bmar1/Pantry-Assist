@@ -103,7 +103,7 @@ public class MainController {
     }
 
     //Returns all dashboard data
-    @GetMapping("/dashboard/load")
+    @GetMapping("/load")
     public ResponseEntity<DashboardData> loadDashBboard(@AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
         List<Recipe> selectedMeals = mealPlanService.selectMeals(userDetails);
         List<Recipe> randomMeals = mealPlanService.random(userDetails);

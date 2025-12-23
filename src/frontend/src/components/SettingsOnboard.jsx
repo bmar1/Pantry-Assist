@@ -23,10 +23,9 @@ const SettingsOnboard = ({ setShowPreferences }) => {
 
   const handleSubmit = async () => {
     setShowPreferences(false);
-    navigate("/LoadingScreen");
 
     try {
-      const res = await fetch("http://localhost:8080/api/onboarding", {
+      const res = await fetch("/api/onboarding", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

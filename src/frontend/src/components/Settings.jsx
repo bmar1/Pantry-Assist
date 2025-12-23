@@ -17,7 +17,7 @@ export default function Settings({ setShowSettings, setShowPreferences }) {
   // On success, it clears localStorage and redirects to the login page.
   const handleDeleteAccount = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/auth/delete", {
+      const response = await fetch("/api/auth/delete", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

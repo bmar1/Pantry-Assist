@@ -1,45 +1,49 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
 
 export default function LoadingScreen() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [show, setShow] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setFadeOut(true);
-      setTimeout(() => {
-        setShow(false);
-        navigate("/dashboard");
-      }, 500); // fade-out duration
-    }, 6500); // total loading time
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (!show) return null;
-
+  
   return (
-    <div
-      className={`fixed inset-0 flex flex-col items-center justify-center z-50 transition-opacity duration-500 ${fadeOut ? "opacity-0" : "opacity-100"
-        }`}
-      style={{ backgroundColor: "#22c55e" }}
+     <div
+      className="fixed inset-0 flex flex-col items-center justify-center z-50"
+      style={{
+        background: "linear-gradient(135deg, #8bcbc4 0%, #c4d7b2 100%)",
+      }}
     >
-      <h1 className="text-white text-3xl font-bold mb-8">
-        Loading... Making you a great meal plan!
+    
+      {/* Pulsing circle */}
+      <div className="mb-8">
+        <div
+          className="w-16 h-16 bg-white/30 rounded-full flex items-center justify-center"
+          style={{
+            animation: "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+          }}
+        >
+          <div className="w-10 h-10 bg-white/60 rounded-full"></div>
+        </div>
+      </div>
+
+      <h1 className="text-white text-2xl font-medium mb-10 tracking-wide">
+        Loading...
       </h1>
 
-      {/* Progress bar container */}
-      <div className="w-64 h-3 bg-white/30 rounded-full overflow-hidden">
-        {/* Progress bar animation */}
+      {/* Modern progress bar */}
+      <div className="w-80 h-1.5 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
         <div
-          className="h-3 bg-white rounded-full"
+          className="h-full bg-white rounded-full shadow-lg"
           style={{
-            animation: "progressBar 5s linear forwards",
+            animation: "progressBar 5s cubic-bezier(0.4, 0, 0.2, 1) forwards",
+            boxShadow: "0 0 20px rgba(255, 255, 255, 0.5)",
           }}
         ></div>
       </div>
-      {/* On each frame adjust the progress bar's width */}
+
       <style jsx>{`
         @keyframes progressBar {
           0% {
@@ -47,6 +51,18 @@ export default function LoadingScreen() {
           }
           100% {
             width: 100%;
+          }
+        }
+
+        @keyframes pulse {
+          0%,
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+          50% {
+            transform: scale(1.1);
+            opacity: 0.8;
           }
         }
       `}</style>
