@@ -150,7 +150,7 @@ export default function Dashboard() {
 
       <main className={`p-8 transition-all duration-300 ${isNavVisible ? 'ml-60' : 'ml-52'}`}>
         {showNewMealPlan && (<NewMealPlanShowcase meals={meals} onClose={() => setShowNewMealPlan(false)} />)} 
-        {showOnboarding && <OnboardingCard setShowOnboarding={setShowOnboarding} />}
+        {showOnboarding && <OnboardingCard setShowOnboarding={setShowOnboarding} setShowLoading={setIsLoading}/>}
         {showSettings && <Settings setShowSettings={setShowSettings} setShowPreferences={setShowPreferences} />}
         {showPreferences && <SettingsOnboard setShowPreferences={setShowPreferences} />}
         

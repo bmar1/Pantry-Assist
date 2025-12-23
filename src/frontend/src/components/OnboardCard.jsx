@@ -29,7 +29,7 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
   const handleBack = () => setStep((prev) => Math.max(prev - 1, 0));
 
   const handleSubmit = async () => {
-    setShowLoading(true);
+   
 
     try {
       const res = await fetch("/api/onboarding", {
@@ -41,7 +41,7 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
         body: JSON.stringify(formData),
       });
       setShowOnboarding(false);
-      
+      setShowLoading(true);
       setTimeout(() => {
         setShowLoading(false);
       }, 5500); 
