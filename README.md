@@ -9,7 +9,7 @@ A full-stack application aimed to help you save food, tighten your budget, and p
 
 
 ##  Objective
-This project aims to serve those who are on a budget or want help tracking what they eat — from calories to trying new foods — all in a way that’s easy to manage through the app, so you can spend more time doing what’s important to you! 💪🍽️
+This project aims to serve those who are on a budget or want help tracking what they eat — from calories to trying new foods — all in a way that’s easy to manage through the app, so you can spend more time doing what’s important to you! 
 
 ---
 
@@ -18,7 +18,7 @@ This project aims to serve those who are on a budget or want help tracking what 
 Currently, pantry assist is only hosted with the frontend, if you'd like to run this code locally, you need:
 - AWS RDS, EC2 instances
 - Pg Admin
-- API keys relevant
+- API keys relevant (Walmart, with public/private keys, MealDB, Nutrionix which is now deprecated)
 
   ### 💻 To run it locally:
 ```bash
@@ -54,6 +54,8 @@ https://pantry-assist.vercel.app/landing
 
 ### Contributing
 
-If you'd like to contribute, reach out to me on any social media and lets' talk!
+If you'd like to contribute, reach out to me on any social media and let's talk
+
+Otherwise, feel free to leave some issues or pull requests!
 
 
