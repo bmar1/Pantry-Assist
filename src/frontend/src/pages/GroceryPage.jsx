@@ -11,10 +11,10 @@ const GroceryListPage = () => {
     const [isLoading, setIsLoading] = useState(() => !location.state?.grocery);
 
     useEffect(() => {
-      if (meals === null || grocery === null) {
-      navigate("/LoadingScreen", { state: { page: "dashboard" } });
+      if (groceryList === null) {
+      navigate("/LoadingScreen", { state: { page: "grocery" } });
     }
-    }, [meals, grocery, navigate]);
+    }, [groceryList, navigate]);
 
     useEffect(() => {
     const loadGrocery = async () => {
