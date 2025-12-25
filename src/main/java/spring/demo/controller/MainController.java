@@ -87,7 +87,7 @@ public class MainController {
 
         //Return filtered list after onboarding
         try {
-            recipieList = mealPlanService.loadandFilterRecipies(user);
+            recipieList = mealPlanService.loadandFilterRecipies(user, recipieList, priceList);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -96,8 +96,14 @@ public class MainController {
             ingredientRepository.save(ingredient);
 
         }
+        int MAX_MEAL_PLAN_SIZE = (user.getPreferences().getMeals() * 7);
+        if(recipieList.size() > MAX_MEAL_PLAN_SIZE){
+            //filter existing recipes further, to save ingredients
+            recipieList = mealPlanService.filterRecipes(recipieList, MAX_MEAL_PLAN_SIZE,
+                    user.getPreferences().getCalories(), user.getPreferences().getMeals());
+        }
 
-        mealPlanService.findAndSaveMealPlan(user);
+        mealPlanService.findAndSaveMealPlan(user, recipieList, priceList);
         userRepository.save(user);
         return ResponseEntity.ok(recipieList);
     }
@@ -105,7 +111,7 @@ public class MainController {
     //Returns all dashboard data
     @GetMapping("/load")
     public ResponseEntity<DashboardData> loadDashBboard(@AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
-        List<Recipe> selectedMeals = mealPlanService.selectMeals(userDetails);
+        List<Recipe> selectedMeals = mealPlanService.selectMeals(userDetails, recipieList);
         List<Recipe> randomMeals = mealPlanService.random(userDetails);
         List<Ingredient> groceryList = groceryList(userDetails);
 

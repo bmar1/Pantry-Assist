@@ -128,4 +128,9 @@ public class MealService {
 
         return recipe;
     }
+
+    public ArrayList<Recipe> filterRecipes(ArrayList<Recipe> recipes, int MAX_MEAL_PLAN_SIZE) {
+
+        return recipes;
+    }
 }

@@ -20,6 +20,7 @@ import spring.demo.models.repository.IngredientRepository;
 import spring.demo.models.repository.RecipeRepository;
 import spring.demo.models.repository.UserRepository;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,10 +40,6 @@ public class MealPlanService {
     private static final Logger log = LoggerFactory.getLogger(MealPlanService.class);
 
 
-    private ArrayList<Recipe> recipieList = new ArrayList<Recipe>();
-    private ArrayList<Ingredient> priceList = new ArrayList<Ingredient>();
-
-
     @Autowired
     public MealPlanService(UserRepository userRepository, JwtService jwtService, AuthenticationManager authenticationManager,
                           MealService mealService, NutritionService nutritionService,
@@ -59,10 +56,10 @@ public class MealPlanService {
     }
 
     //Main algorithm: This loads and filtered recipes by several categories, filters them by cost, price and ingredeints, returning a final list
-    public ArrayList<Recipe> loadandFilterRecipies(@NotNull User user) throws Exception {
+    public ArrayList<Recipe> loadandFilterRecipies(@NotNull User user, ArrayList<Recipe> recipieList, ArrayList<Ingredient> priceList) throws Exception {
 
         //Load recipes by category from the DB
-        List<String> categories = Arrays.asList("Chicken", "Beef", "Seafood", "Vegetarian", "Breakfast", "Vegan", "Goat", "Lamb", "Pork", "Breakfast");
+        List<String> categories = Arrays.asList("Chicken", "Beef", "Seafood", "Vegetarian", "Vegan", "Goat", "Lamb", "Pork", "Breakfast");
         recipieList = (ArrayList<Recipe>) categories.stream()
                 .flatMap(category -> {
                     try {
@@ -78,17 +75,17 @@ public class MealPlanService {
         //Filter in 3 steps and return final list
         recipieList = filterByCommonIngredientsOptimized(recipieList, 2);
         recipieList = filterByCalories(recipieList, user);
-        recipieList = filterByPrice(recipieList, user);
+        recipieList = filterByPrice(recipieList, user, priceList);
         return recipieList;
     }
 
-    private ArrayList<Recipe> filterByPrice(ArrayList<Recipe> recipieList, User user) throws Exception {
+    private ArrayList<Recipe> filterByPrice(ArrayList<Recipe> recipieList, User user, ArrayList<Ingredient> priceList) throws Exception {
         ArrayList<Recipe> filtered = new ArrayList<>();
         // Removes a recipe if the price, based on serving size costs too much
         double costMax = user.getPreferences().getBudget() / (user.getPreferences().getMeals() * 7) + 1.2;
 
         for (Recipe recipe : recipieList) {
-            if (getMealCost(recipe) < costMax) {
+            if (getMealCost(recipe, priceList) < costMax) {
                 filtered.add(recipe);
             }
         }
@@ -96,7 +93,7 @@ public class MealPlanService {
     }
 
     //returns a meal cost of a function by calcualting ingredient cost
-    private double getMealCost(Recipe recipe) throws Exception {
+    private double getMealCost(Recipe recipe, ArrayList<Ingredient> priceList) throws Exception {
         double mealCost = 0.0;
         Set<String> processedIngredients = new HashSet<>();
 
@@ -112,7 +109,7 @@ public class MealPlanService {
             }
 
             // Get ingredient from cache, DB, or API
-            Optional<Ingredient> ingredient = getOrFetchIngredient(ingName, query);
+            Optional<Ingredient> ingredient = getOrFetchIngredient(ingName, query, priceList);
 
             if (ingredient.isPresent()) {
                 // Calculate cost for this ingredient
@@ -131,7 +128,7 @@ public class MealPlanService {
     }
 
     // Get ingredient from local cache, DB, or fetch from API
-    private Optional<Ingredient> getOrFetchIngredient(String ingName, String query) {
+    private Optional<Ingredient> getOrFetchIngredient(String ingName, String query, ArrayList<Ingredient> priceList) {
         // Check local cache first
         Optional<Ingredient> local = priceList.stream()
                 .filter(i -> i != null && i.getName() != null)
@@ -147,15 +144,15 @@ public class MealPlanService {
         Optional<Ingredient> dbIngredient = ingredientRepository.findByNameIgnoreCase(query);
 
         if (dbIngredient.isPresent()) {
-            return handleDatabaseIngredient(dbIngredient.get(), ingName, query);
+            return handleDatabaseIngredient(dbIngredient.get(), ingName, query, priceList);
         }
 
         // Fetch from API as last resort
-        return fetchNewIngredient(ingName, query);
+        return fetchNewIngredient(ingName, query, priceList);
     }
 
     // Handle ingredient found in database (check cache validity)
-    private Optional<Ingredient> handleDatabaseIngredient(Ingredient dbIng, String ingName, String query) {
+    private Optional<Ingredient> handleDatabaseIngredient(Ingredient dbIng, String ingName, String query, ArrayList<Ingredient> priceList) {
         log.info("Found in DB: {}", ingName);
         log.info("Cache valid? {}", dbIng.isCacheValid());
 
@@ -165,11 +162,11 @@ public class MealPlanService {
         }
 
         // Cache expired - refresh from db
-        return refreshIngredientFromAPI(dbIng, ingName, query);
+        return refreshIngredientFromAPI(dbIng, ingName, query, priceList);
     }
 
     // Refresh expired ingredient from db
-    private Optional<Ingredient> refreshIngredientFromAPI(Ingredient dbIng, String ingName, String query) {
+    private Optional<Ingredient> refreshIngredientFromAPI(Ingredient dbIng, String ingName, String query, ArrayList<Ingredient> priceList) {
         try {
             Ingredient fresh = priceService.getIngredient(ingName);
             if (fresh != null) {
@@ -190,7 +187,7 @@ public class MealPlanService {
     }
 
     // Fetch new ingredient from db
-    private Optional<Ingredient> fetchNewIngredient(String ingName, String query) {
+    private Optional<Ingredient> fetchNewIngredient(String ingName, String query, ArrayList<Ingredient> priceList) {
         try {
             Ingredient fresh = priceService.getIngredient(ingName);
             if (fresh != null) {
@@ -414,7 +411,7 @@ public class MealPlanService {
     }
 
     //Find all user meals and generate new recipe list based off requirements of calories and existing recipes
-    public List<Recipe> generateSubRecipeList(int req, int calorie, List<UserMealPlan> existingPlan, List<Recipe> alreadySelected) {
+    public List<Recipe> generateSubRecipeList(int req, int calorie, List<UserMealPlan> existingPlan, List<Recipe> alreadySelected, ArrayList<Recipe> recipieList) {
         List<Recipe> allMeals = existingPlan.stream()
                 .filter(Objects::nonNull)
                 .filter(plan -> plan.getRecipe() != null)
@@ -434,7 +431,7 @@ public class MealPlanService {
 
         if (!allMeals.isEmpty()) {
             //fetch meals in plan, in memory or db
-            fetchAllMeals(allMeals, list, req, min);
+            fetchAllMeals(allMeals, list, req, min, recipieList);
         }
 
         int totalCalories = list.stream().mapToInt(Recipe::getCalories).sum();
@@ -471,7 +468,7 @@ public class MealPlanService {
         return list;
     }
 
-    private List<Recipe> fetchAllMeals(List<Recipe> allMeals, List<Recipe> list, int req, int min) {
+    private List<Recipe> fetchAllMeals(List<Recipe> allMeals, List<Recipe> list, int req, int min, ArrayList<Recipe> recipieList) {
         for (Recipe recipe : allMeals) {
             if (list.size() >= req) break;
             if (list.contains(recipe)) continue;
@@ -513,7 +510,7 @@ public class MealPlanService {
 
 
     //Selects a required amount of meals for the user's new meal plan of the day, opts out for early returns where able
-    public List<Recipe> selectMeals(@AuthenticationPrincipal UserDetails userDetails) {
+    public List<Recipe> selectMeals(@AuthenticationPrincipal UserDetails userDetails, ArrayList<Recipe> recipeList) {
         String email = userDetails.getUsername();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -567,7 +564,7 @@ public class MealPlanService {
                 subList.clear();
                 existingPlan = new ArrayList<>(user.getMealPlans());
 
-                subList = generateSubRecipeList(req, calorie, existingPlan, subList);
+                subList = generateSubRecipeList(req, calorie, existingPlan, subList, recipeList);
 
 
             } else if (subList.size() == req || subList.size() == req + 1) {
@@ -580,7 +577,7 @@ public class MealPlanService {
         // Build new meal plan if we don't have enough
         if (subList.size() < req) {
             log.info("Need more meals. Generating {} meals...", req - subList.size());
-            subList = generateSubRecipeList(req, calorie, existingPlan, subList);
+            subList = generateSubRecipeList(req, calorie, existingPlan, subList, recipeList);
         }
 
         subList = savePlannedMeals(subList, existingPlan, user);
@@ -646,13 +643,10 @@ public class MealPlanService {
     }
 
     //Finds and save's recipe meal plans
-    public void findAndSaveMealPlan(User user) {
+    public void findAndSaveMealPlan(User user, ArrayList<Recipe> recipieList, ArrayList<Ingredient> priceList) {
         for (Recipe recipe : recipieList) {
             // Add to meal plan
-            Recipe managedRecipe = recipeRepository.findByNameIgnoreCase(recipe.getName())
-                    .orElseThrow(() -> new RuntimeException("Recipe not found: " + recipe.getName()));
-
-            UserMealPlan mealPlan = new UserMealPlan(user, managedRecipe);
+            UserMealPlan mealPlan = new UserMealPlan(user, recipe);
             user.getMealPlans().add(mealPlan);
 
             // Save user groceryList(ingridients) based on existing recipes ingredients
@@ -698,6 +692,52 @@ public class MealPlanService {
     }
 
 
+    public ArrayList<Recipe> filterRecipes(ArrayList<Recipe> recipieList, int maxMealPlanSize, int calories, int meals) {
+        //build list of each type, and category
+        Map<String, List<String>> categoryMap = Map.of(
+                "meat", Arrays.asList("Chicken", "Beef", "Seafood", "Pork"),
+                "veg", Arrays.asList("Vegetarian", "Vegan"),
+                "carb", Arrays.asList("Breakfast")
+        );
 
+        //create map for each limit of each category
+        Map<String, Integer> limits = Map.of(
+                "meat", (int) Math.round(maxMealPlanSize * 0.60),
+                "veg", (int) Math.round(maxMealPlanSize * 0.20),
+                "carb", (int) Math.round(maxMealPlanSize * 0.20)
+        );
 
+        double calPerMeal = (double) (calories / meals);
+        List<Recipe> filtered = new ArrayList<>();
+
+        // filter by calories if too close to max, then filter to add to the pool, based on recipe category
+        Map<String, List<Recipe>> pools = recipieList.stream()
+                .filter(r -> Math.abs(r.getCalories() - calPerMeal) <= calPerMeal + 100)
+                .sorted(Comparator.comparingInt(r -> Math.abs(r.getCalories() - (int) calPerMeal)))
+                .collect(Collectors.groupingBy(recipe ->
+                        categoryMap.entrySet().stream()
+                                .filter(e -> e.getValue().contains(recipe.getCategory()))
+                                .map(Map.Entry::getKey)
+                                .findFirst()
+                                .orElse("other")
+                ));
+
+        // Add recipes from each pool up to limit using limits map
+        for (String type : Arrays.asList("meat", "veg", "carb")) {
+            pools.getOrDefault(type, Collections.emptyList()).stream()
+                    .limit(limits.getOrDefault(type, 0))
+                    .forEach(filtered::add);
+        }
+
+        // Fill remaining slots if needed if not enough meals are in each category
+        if (filtered.size() < maxMealPlanSize) {
+            recipieList.stream()
+                    .filter(r -> !filtered.contains(r))
+                    .sorted(Comparator.comparingInt(r -> Math.abs(r.getCalories() - (int) calPerMeal)))
+                    .limit(maxMealPlanSize - filtered.size())
+                    .forEach(filtered::add);
+        }
+
+        return new ArrayList<>(filtered);
+    }
 }
