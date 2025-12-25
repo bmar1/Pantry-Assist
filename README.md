@@ -9,7 +9,7 @@ A full-stack application aimed to help you save food, tighten your budget, and p
 
 
 ##  Objective
-This project aims to serve those who are on a budget or want help tracking what they eat — from calories to trying new foods — all in a way that’s easy to manage through the app, so you can spend more time doing what’s important to you! 
+This project aims to serve those who are on a budget or want help tracking what they eat — from calories to trying new foods — all in a way that’s easy to manage through the app, so you can spend more time doing what’s important to you!
 
 ---
 
@@ -32,10 +32,10 @@ npm start
 ###  Grocery Tracking / Planning
 This application, based on your requirements and use cases, adapts to help you find interesting meals while providing grocery prices in your local area via Walmart’s data.
 
-###  Meal Planning  
+###  Meal Planning
 Need help tracking how many calories you eat or what exactly you’re eating? Say no more! Pantry Assist easily tracks your weekly meals in a clean, organized format.
 
-###  Secure Login  
+###  Secure Login
 Pantry Assist boasts secure, role-based access control throughout the app, enforcing security through JWT tokens.
 
 ### Ease of use
@@ -47,9 +47,12 @@ We offer an easy UI to navigate through to help you day-by-day to cook, and plan
 
 ## 🚀 Setup / Use
 
-### 🌐 No need to worry!  
-Feel free to refer to the website currently, hosting the frontend only, but soon full-stack via EC2:  
+### 🌐 No need to worry!
+Feel free to refer to the website currently, hosted full-stack on AWS EC2!
 
+**http://3.94.144.194/landing**
+
+Frontend Only Host:
 https://pantry-assist.vercel.app/landing
 
 ### Contributing
