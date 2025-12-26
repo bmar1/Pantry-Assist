@@ -228,7 +228,7 @@ export default function Landing() {
 
               <div className="mt-4 flex-1 flex items-end justify-center relative z-10">
                 <img
-                  src="./public/menu.png"
+                  src="/menu.png"
                   alt="Menu example"
                   className="max-h-80 rounded-2xl drop-shadow-2xl group-hover:scale-105 transition-transform duration-300"
                 />
@@ -260,7 +260,7 @@ export default function Landing() {
 
               <div className="mt-8 flex-1 flex items-end justify-center relative z-10">
                 <img
-                  src="./public/meal.jpg"
+                  src="/meal.jpg"
                   alt="Meal example"
                   className="max-h-72 rounded-2xl object-contain drop-shadow-2xl group-hover:scale-105 transition-transform duration-300"
                 />
