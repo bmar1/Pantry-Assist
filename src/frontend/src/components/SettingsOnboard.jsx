@@ -5,9 +5,9 @@
  * accessed from the main settings page.
  */
 
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const SettingsOnboard = ({ setShowPreferences }) => {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ const SettingsOnboard = ({ setShowPreferences }) => {
     budget: 50,
     meals: 2,
     vegan: false,
-    allergies: "",
+    allergies: '',
     update: true // Flag to indicate that this is an update to existing preferences.
   });
 
@@ -25,27 +25,27 @@ const SettingsOnboard = ({ setShowPreferences }) => {
     setShowPreferences(false);
 
     try {
-      const res = await fetch("/api/onboarding", {
-        method: "POST",
+      const res = await fetch('http://localhost:8080/api/onboarding', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData)
       });
 
-      localStorage.removeItem("onboarding");
+      localStorage.removeItem('onboarding');
 
       if (res.ok) {
         const data = await res.json();
         console.table(data);
-        alert("Preferences updated successfully!");
+        alert('Preferences updated successfully!');
       } else {
-        alert("Failed to update preferences");
+        alert('Failed to update preferences');
       }
     } catch (err) {
       console.error(err);
-      alert("Error updating preferences");
+      alert('Error updating preferences');
     }
   };
 
@@ -54,16 +54,15 @@ const SettingsOnboard = ({ setShowPreferences }) => {
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 30 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
         className="bg-white rounded-2xl relative shadow-2xl p-8 max-w-md w-full text-green-700"
       >
-        
-         <button
-      className="absolute top-2 right-1 text-gray-500 hover:text-gray-700 text-2xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
-      onClick={() => setShowPreferences(false)}
-    >
-      ×
-    </button>
+        <button
+          className="absolute top-2 right-1 text-gray-500 hover:text-gray-700 text-2xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
+          onClick={() => setShowPreferences(false)}
+        >
+          ×
+        </button>
 
         <h1 className="text-3xl md:text-4xl font-extrabold text-center mb-6">
           Help us get to know you!
@@ -78,9 +77,7 @@ const SettingsOnboard = ({ setShowPreferences }) => {
             max="2500"
             step="100"
             value={formData.calories}
-            onChange={(e) =>
-              setFormData({ ...formData, calories: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, calories: e.target.value })}
             className="w-full accent-green-600"
           />
           <p className="text-sm mt-1">{formData.calories} calories/day</p>
@@ -95,9 +92,7 @@ const SettingsOnboard = ({ setShowPreferences }) => {
             max="100"
             step="5"
             value={formData.budget}
-            onChange={(e) =>
-              setFormData({ ...formData, budget: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
             className="w-full accent-green-600"
           />
           <p className="text-sm mt-1">${formData.budget}/week</p>
@@ -108,9 +103,7 @@ const SettingsOnboard = ({ setShowPreferences }) => {
           <h2 className="text-lg font-bold mb-2">Meals per Day</h2>
           <select
             value={formData.meals}
-            onChange={(e) =>
-              setFormData({ ...formData, meals: Number(e.target.value) })
-            }
+            onChange={(e) => setFormData({ ...formData, meals: Number(e.target.value) })}
             className="p-2 rounded w-full border border-gray-300"
           >
             <option value={2}>2</option>
@@ -125,9 +118,7 @@ const SettingsOnboard = ({ setShowPreferences }) => {
             <input
               type="checkbox"
               checked={formData.vegan}
-              onChange={(e) =>
-                setFormData({ ...formData, vegan: e.target.checked })
-              }
+              onChange={(e) => setFormData({ ...formData, vegan: e.target.checked })}
             />
             <span>Vegan</span>
           </div>
@@ -135,9 +126,7 @@ const SettingsOnboard = ({ setShowPreferences }) => {
             type="text"
             placeholder="Allergies (optional)"
             value={formData.allergies}
-            onChange={(e) =>
-              setFormData({ ...formData, allergies: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, allergies: e.target.value })}
             className="p-2 rounded w-full border border-gray-300"
           />
         </div>

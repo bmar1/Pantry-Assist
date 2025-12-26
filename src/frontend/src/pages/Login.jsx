@@ -1,13 +1,12 @@
-import { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-
+import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true); // state to switch between login/signup
-  const location = useLocation()
+  const location = useLocation();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [accountError, setAccountError] = useState(false);
@@ -17,26 +16,28 @@ export default function AuthForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const endpoint = isLogin ? "login" : "signup";
-    const url = `/api/auth/${endpoint}`;
+    const endpoint = isLogin ? 'login' : 'signup';
+    const url = `http://localhost:8080/api/auth/${endpoint}`;
     let res;
     res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
     });
 
     if (res.ok) {
       const data = await res.json();
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("email", email);
- 
-      if(!isLogin) {
-        localStorage.setItem("onboarding", true);
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('email', email);
+
+      if (!isLogin) {
+        localStorage.setItem('onboarding', true);
       }
-      navigate("/dashboard");
+      navigate('/dashboard');
       setPasswordError(false);
-      {/* If any error occurs, from status, change error */ }
+      {
+        /* If any error occurs, from status, change error */
+      }
     } else if (isLogin && res.status === 403) {
       setPasswordError(true);
       setTimeout(() => setPasswordError(false), 3000);
@@ -56,7 +57,9 @@ export default function AuthForm() {
             alt="Groceries"
             className="w-32 h-32 md:w-48 md:h-48 object-contain mb-4 md:mb-6"
           />
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 md:mb-3">Welcome to Pantry Assist</h2>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 md:mb-3">
+            Welcome to Pantry Assist
+          </h2>
           <p className="text-sm sm:text-base md:text-lg">
             Your smart solution for grocery management.
           </p>
@@ -68,7 +71,7 @@ export default function AuthForm() {
             Pantry Assist
           </h1>
           <h2 className="text-base sm:text-lg md:text-xl text-gray-700 text-center mb-6 sm:mb-8">
-            {isLogin ? "Welcome back!" : "Create your account"}
+            {isLogin ? 'Welcome back!' : 'Create your account'}
           </h2>
           {message && <p className="text-red-500 text-lg mb-2 text-center">{message}</p>}
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -88,14 +91,15 @@ export default function AuthForm() {
               <label className="block text-gray-800 font-semibold mb-2">Password</label>
               <div className="relative">
                 <input
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition ${passwordError
-                    ? "border-red-500 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-[#628d45]"
-                    }`}
+                  className={`w-full px-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition ${
+                    passwordError
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-gray-300 focus:ring-[#628d45]'
+                  }`}
                   placeholder="********"
                 />
                 {passwordError && (
@@ -114,7 +118,7 @@ export default function AuthForm() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-3 text-gray-600 hover:text-gray-900 transition"
                 >
-                  {showPassword ? "Hide" : "Show"}
+                  {showPassword ? 'Hide' : 'Show'}
                 </button>
               </div>
             </div>
@@ -123,18 +127,18 @@ export default function AuthForm() {
               type="submit"
               className="w-full bg-[#628d45] text-white py-3 rounded-lg hover:bg-[#334924] transition-colors font-semibold text-lg"
             >
-              {isLogin ? "Log In" : "Sign Up"}
+              {isLogin ? 'Log In' : 'Sign Up'}
             </button>
           </form>
 
           <p className="mt-6 text-center text-gray-700">
-            {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
+            {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
             <button
               type="button"
               onClick={() => setIsLogin(!isLogin)}
               className="text-[#628d45] hover:underline font-semibold"
             >
-              {isLogin ? "Sign Up" : "Log In"}
+              {isLogin ? 'Sign Up' : 'Log In'}
             </button>
           </p>
         </div>

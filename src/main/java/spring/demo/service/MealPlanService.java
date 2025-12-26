@@ -644,20 +644,42 @@ public class MealPlanService {
 
     //Finds and save's recipe meal plans
     public void findAndSaveMealPlan(User user, ArrayList<Recipe> recipieList, ArrayList<Ingredient> priceList) {
+        // Get existing ingredient names in grocery list to avoid duplicates
+        Set<String> existingIngredientNames = user.getGroceryList().stream()
+                .map(ui -> ui.getIngredient().getName().toLowerCase())
+                .collect(Collectors.toSet());
+
+        List<String> commonItems = Arrays.asList("salt", "pepper", "water", "sugar", "oil",
+                "olive oil", "flour", "rice", "baking powder", "soy sauce", "vinegar", "cumin",
+                "butter", "parsley", "garlic", "onion powder", "paprika", "black pepper", "kosher salt");
+
         for (Recipe recipe : recipieList) {
             // Add to meal plan
             UserMealPlan mealPlan = new UserMealPlan(user, recipe);
             user.getMealPlans().add(mealPlan);
 
-            // Save user groceryList(ingridients) based on existing recipes ingredients
             recipe.getIngredients().keySet().forEach(ingredientName -> {
-                priceList.stream()
-                        .filter(ing -> ing.getName().equalsIgnoreCase(ingredientName))
-                        .findFirst()
-                        .ifPresent(ingredient -> {
-                            UserIngredient userIngredient = new UserIngredient(user, ingredient);
-                            user.getGroceryList().add(userIngredient);
-                        });
+                String lowerName = ingredientName.toLowerCase().trim();
+
+                // Skip if already in grocery list
+                if (existingIngredientNames.contains(lowerName)) {
+                    return;
+                }
+
+                // Check if ingredient contains any common item
+                boolean isCommonItem = commonItems.stream()
+                        .anyMatch(common -> lowerName.contains(common) || common.contains(lowerName));
+
+                if (!isCommonItem) {
+                    priceList.stream()
+                            .filter(ing -> ing.getName().equalsIgnoreCase(ingredientName))
+                            .findFirst()
+                            .ifPresent(ingredient -> {
+                                UserIngredient userIngredient = new UserIngredient(user, ingredient);
+                                user.getGroceryList().add(userIngredient);
+                                existingIngredientNames.add(lowerName); // Track it
+                            });
+                }
             });
         }
     }

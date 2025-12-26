@@ -96,6 +96,9 @@ public class MainController {
             ingredientRepository.save(ingredient);
 
         }
+        user.getGroceryList().clear();
+        user.getMealPlans().clear();
+
         int MAX_MEAL_PLAN_SIZE = (user.getPreferences().getMeals() * 7);
         if(recipieList.size() > MAX_MEAL_PLAN_SIZE){
             //filter existing recipes further, to save ingredients

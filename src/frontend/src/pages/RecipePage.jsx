@@ -1,185 +1,186 @@
 /**
  * @file Recipepage.jsx
- * @description This page/component handles the main responsive design towards: 
- * planning & cooking meals, eating meals and updating meals, 
+ * @description This page/component handles the main responsive design towards:
+ * planning & cooking meals, eating meals and updating meals,
  * it incorporates the list, a helpful guide, and steps laid out upon completion, giving a message.
  */
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
-import { useState, useEffect, useMemo } from "react";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import { useState, useEffect, useMemo } from 'react';
 
 const RecipePage = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const { name } = location.state || {}
-    const [recipe, setRecipe] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [stepCompleted, setStepCompleted] = useState([]);
-    const [showPopup, setShowPopup] = useState(false);
-    const [mealEaten, setMealEaten] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { name } = location.state || {};
+  const [recipe, setRecipe] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [stepCompleted, setStepCompleted] = useState([]);
+  const [showPopup, setShowPopup] = useState(false);
+  const [mealEaten, setMealEaten] = useState(false);
 
-    //updates backend to mark meal as eaten
-    const markMealAsEaten = async () => {
-        try {
-            const token = localStorage.getItem("token");
+  //updates backend to mark meal as eaten
+  const markMealAsEaten = async () => {
+    try {
+      const token = localStorage.getItem('token');
 
-            const url = `/api/meals/updateMeal?name=${encodeURIComponent(name)}`;
-            console.log("Request URL:", url);
+      const url = `/api/meals/updateMeal?name=${encodeURIComponent(name)}`;
+      console.log('Request URL:', url);
 
-            const response = await fetch(url, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`,
-                },
-            });
-
-            if (response.ok) {
-                console.log(`Meal '${name}' marked as eaten.`);
-            } else {
-                console.error("Failed to mark meal as eaten:", response.status);
-            }
-        } catch (error) {
-            console.error("Error marking meal as eaten:", error);
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
         }
-    };
+      });
 
-    const handleBack = () => {
+      if (response.ok) {
+        console.log(`Meal '${name}' marked as eaten.`);
+      } else {
+        console.error('Failed to mark meal as eaten:', response.status);
+      }
+    } catch (error) {
+      console.error('Error marking meal as eaten:', error);
+    }
+  };
+
+  const handleBack = () => {
     navigate('/dashboard');
+  };
+
+  useEffect(() => {
+    const loadMeal = async () => {
+      if (!name) {
+        setLoading(false);
+        return;
+      }
+      try {
+        setLoading(true);
+        const encodedName = encodeURIComponent(name);
+        const response = await fetch(`http://localhost:8080/api/meal?name=${encodedName}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setRecipe(Array.isArray(data) ? data[0] : data);
+        } else {
+          console.error('Failed to load meal:', response.status);
+          setRecipe(null);
+        }
+      } catch (error) {
+        console.error('Error loading meal:', error);
+        setRecipe(null);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    useEffect(() => {
-        const loadMeal = async () => {
-            if (!name) {
-                setLoading(false);
-                return;
-            }
-            try {
-                setLoading(true);
-                const encodedName = encodeURIComponent(name);
-                const response = await fetch(`/api/meal?name=${encodedName}`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                    },
-                });
+    loadMeal();
+  }, [name]);
 
-                if (response.ok) {
-                    const data = await response.json();
-                    setRecipe(Array.isArray(data) ? data[0] : data);
-                } else {
-                    console.error("Failed to load meal:", response.status);
-                    setRecipe(null);
-                }
-            } catch (error) {
-                console.error("Error loading meal:", error);
-                setRecipe(null);
-            } finally {
-                setLoading(false);
-            }
-        };
+  //memoize the steps and filter based on new line for each new step
+  const steps = useMemo(() => {
+    if (!recipe?.instructions) return [];
+    return recipe.instructions
+      .replace(/\\r\\n/g, '\n')
+      .replace(/\\n/g, '\n')
+      .split(/\n+/)
+      .filter((step) => step.trim() !== '');
+  }, [recipe?.instructions]);
 
-        loadMeal();
-    }, [name]);
+  //update completion based on steps completed
+  const completionPercentage =
+    steps.length > 0 ? Math.round((stepCompleted.filter(Boolean).length / steps.length) * 100) : 0;
 
-    //memoize the steps and filter based on new line for each new step
-    const steps = useMemo(() => {
-        if (!recipe?.instructions) return [];
-        return recipe.instructions
-            .replace(/\\r\\n/g, '\n')
-            .replace(/\\n/g, '\n')
-            .split(/\n+/)
-            .filter(step => step.trim() !== '');
-    }, [recipe?.instructions]);
+  const allStepsCompleted =
+    steps.length > 0 && stepCompleted.filter(Boolean).length === steps.length;
 
-    //update completion based on steps completed 
-      const completionPercentage = steps.length > 0 
-    ? Math.round((stepCompleted.filter(Boolean).length / steps.length) * 100)
-    : 0;
+  // Initialize stepCompleted only when steps change
+  useEffect(() => {
+    if (steps && steps.length > 0) {
+      setStepCompleted(new Array(steps.length).fill(false));
+    }
+  }, [steps]);
 
-     const allStepsCompleted = steps.length > 0 && stepCompleted.filter(Boolean).length === steps.length;
+  // Check if all steps are completed
+  useEffect(() => {
+    // Only run if we have steps and stepCompleted is initialized
+    if (stepCompleted.length > 0 && steps.length > 0) {
+      const allCompleted = stepCompleted.every(Boolean);
 
-    // Initialize stepCompleted only when steps change
-    useEffect(() => {
-        if (steps && steps.length > 0) {
-            setStepCompleted(new Array(steps.length).fill(false));
+      if (allCompleted && !mealEaten) {
+        // Only trigger if not already eaten
+        setShowPopup(true);
+        setMealEaten(true);
+
+        const timer = setTimeout(() => {
+          setShowPopup(false);
+        }, 4000);
+
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [stepCompleted, steps.length, mealEaten]);
+
+  // Call API when meal is marked as eaten
+  useEffect(() => {
+    const markMeal = async () => {
+      if (mealEaten && name) {
+        try {
+          await markMealAsEaten();
+        } catch (error) {
+          console.error('Failed to mark meal as eaten:', error);
         }
-    }, [steps]);
-
-    // Check if all steps are completed
-    useEffect(() => {
-        // Only run if we have steps and stepCompleted is initialized
-        if (stepCompleted.length > 0 && steps.length > 0) {
-            const allCompleted = stepCompleted.every(Boolean);
-
-            if (allCompleted && !mealEaten) { // Only trigger if not already eaten
-                setShowPopup(true);
-                setMealEaten(true);
-
-                const timer = setTimeout(() => {
-                    setShowPopup(false);
-                }, 4000);
-
-                return () => clearTimeout(timer);
-            }
-        }
-    }, [stepCompleted, steps.length, mealEaten]);
-
-    // Call API when meal is marked as eaten
-    useEffect(() => {
-        const markMeal = async () => {
-            if (mealEaten && name) {
-                try {
-                    await markMealAsEaten();
-                } catch (error) {
-                    console.error("Failed to mark meal as eaten:", error);
-                }
-            }
-        };
-
-        markMeal();
-    }, [mealEaten, name]);
-
-    // Convert YouTube URL to embed format
-    const getYouTubeEmbedUrl = (url) => {
-        if (!url) return null;
-        const videoId = url.split('v=')[1];
-        const ampersandPosition = videoId?.indexOf('&');
-        if (ampersandPosition !== -1) {
-            return `https://www.youtube.com/embed/${videoId.substring(0, ampersandPosition)}`;
-        }
-        return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+      }
     };
 
-    const embedUrl = getYouTubeEmbedUrl(recipe?.youtube);
+    markMeal();
+  }, [mealEaten, name]);
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-[#3f783f] flex justify-center items-center">
-                <p className="text-white text-xl">Loading...</p>
-            </div>
-        );
+  // Convert YouTube URL to embed format
+  const getYouTubeEmbedUrl = (url) => {
+    if (!url) return null;
+    const videoId = url.split('v=')[1];
+    const ampersandPosition = videoId?.indexOf('&');
+    if (ampersandPosition !== -1) {
+      return `https://www.youtube.com/embed/${videoId.substring(0, ampersandPosition)}`;
     }
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+  };
 
-    if (!recipe) {
-        return (
-            <div className="min-h-screen bg-[#3f783f] flex justify-center items-center">
-                <div className="text-center">
-                    <p className="text-white text-xl mb-4">No recipe data found</p>
-                    <button
-                        onClick={() => navigate("/dashboard")}
-                        className="px-4 py-2 bg-[#7A9E7E] text-white rounded-lg hover:bg-[#668B67]"
-                    >
-                        Back to Dashboard
-                    </button>
-                </div>
-            </div>
-        );
-    }
+  const embedUrl = getYouTubeEmbedUrl(recipe?.youtube);
 
+  if (loading) {
     return (
+      <div className="min-h-screen bg-[#3f783f] flex justify-center items-center">
+        <p className="text-white text-xl">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!recipe) {
+    return (
+      <div className="min-h-screen bg-[#3f783f] flex justify-center items-center">
+        <div className="text-center">
+          <p className="text-white text-xl mb-4">No recipe data found</p>
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="px-4 py-2 bg-[#7A9E7E] text-white rounded-lg hover:bg-[#668B67]"
+          >
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
     <div className="min-h-screen bg-gradient-to-br from-[#6d9851] via-[#5A7A4D] to-[#4a6340] flex justify-center items-start">
       {/* Success Popup */}
       {showPopup && (
@@ -197,7 +198,7 @@ const RecipePage = () => {
             onClick={handleBack}
             className="flex items-center gap-2 px-6 py-3 bg-white/20 backdrop-blur-md text-white rounded-xl hover:bg-white/30 transition-all duration-300 shadow-lg hover:shadow-xl"
           >
-          <span className="font-semibold">Back to Dashboard</span>
+            <span className="font-semibold">Back to Dashboard</span>
           </button>
 
           {/* display badge and percentage */}
@@ -211,7 +212,9 @@ const RecipePage = () => {
                 </div>
                 <div>
                   <div className="text-sm opacity-90">Progress</div>
-                  <div className="text-xs opacity-75">{stepCompleted.filter(Boolean).length}/{steps.length} steps</div>
+                  <div className="text-xs opacity-75">
+                    {stepCompleted.filter(Boolean).length}/{steps.length} steps
+                  </div>
                 </div>
               </div>
             </div>
@@ -235,10 +238,10 @@ const RecipePage = () => {
                 </h1>
                 <div className="flex flex-wrap gap-3">
                   <span className="px-4 py-2 bg-white/25 backdrop-blur-lg text-white rounded-full text-sm font-semibold border border-white/30 shadow-lg">
-                     {recipe.category}
+                    {recipe.category}
                   </span>
                   <span className="px-4 py-2 bg-white/25 backdrop-blur-lg text-white rounded-full text-sm font-semibold border border-white/30 shadow-lg">
-                     {recipe.area}
+                    {recipe.area}
                   </span>
                 </div>
               </div>
@@ -247,7 +250,10 @@ const RecipePage = () => {
 
           <div className="p-8">
             {/* Nutritional Info Cards */}
-            {(recipe.calories > 0 || recipe.protein > 0 || recipe.carbohydrate > 0 || recipe.fat > 0) && (
+            {(recipe.calories > 0 ||
+              recipe.protein > 0 ||
+              recipe.carbohydrate > 0 ||
+              recipe.fat > 0) && (
               <div className="mb-8">
                 <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-3">
                   <span className="text-3xl"></span>
@@ -262,7 +268,6 @@ const RecipePage = () => {
                       <p className="text-xs text-gray-500 mt-1">kcal</p>
                     </div>
                   )}
-                  
                 </div>
               </div>
             )}
@@ -276,18 +281,22 @@ const RecipePage = () => {
                 </h2>
                 <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200 shadow-lg">
                   <ul className="space-y-3">
-                    {recipe.ingredients && Object.entries(recipe.ingredients).map(([ingredient, measure], index) => (
-                      <li key={index} className="flex items-start p-3 bg-white rounded-xl hover:shadow-md transition-shadow">
-                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#6d9851] text-white flex items-center justify-center text-xs font-bold mr-3 mt-0.5">
-                          {index + 1}
-                        </span>
-                        <span className="text-gray-700 flex-1">
-                          <span className="font-bold text-[#5A7A4D]">{measure}</span>
-                          <span className="mx-1">•</span>
-                          <span>{ingredient}</span>
-                        </span>
-                      </li>
-                    ))}
+                    {recipe.ingredients &&
+                      Object.entries(recipe.ingredients).map(([ingredient, measure], index) => (
+                        <li
+                          key={index}
+                          className="flex items-start p-3 bg-white rounded-xl hover:shadow-md transition-shadow"
+                        >
+                          <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#6d9851] text-white flex items-center justify-center text-xs font-bold mr-3 mt-0.5">
+                            {index + 1}
+                          </span>
+                          <span className="text-gray-700 flex-1">
+                            <span className="font-bold text-[#5A7A4D]">{measure}</span>
+                            <span className="mx-1">•</span>
+                            <span>{ingredient}</span>
+                          </span>
+                        </li>
+                      ))}
                   </ul>
                 </div>
               </div>
@@ -313,7 +322,10 @@ const RecipePage = () => {
                         newStepCompleted[index] = !newStepCompleted[index];
                         setStepCompleted(newStepCompleted);
                         // if all steps completed, show poup
-                        if (!stepCompleted[index] && newStepCompleted.filter(Boolean).length === steps.length) {
+                        if (
+                          !stepCompleted[index] &&
+                          newStepCompleted.filter(Boolean).length === steps.length
+                        ) {
                           setShowPopup(true);
                           setTimeout(() => setShowPopup(false), 4000);
                         }
@@ -329,13 +341,17 @@ const RecipePage = () => {
                         >
                           {stepCompleted[index] ? '✓' : index + 1}
                         </div>
-                        <div className={`flex-1 ${stepCompleted[index] ? 'text-white' : 'text-gray-700'}`}>
-                          <p className={`leading-relaxed ${stepCompleted[index] ? 'line-through opacity-90' : ''}`}>
+                        <div
+                          className={`flex-1 ${stepCompleted[index] ? 'text-white' : 'text-gray-700'}`}
+                        >
+                          <p
+                            className={`leading-relaxed ${stepCompleted[index] ? 'line-through opacity-90' : ''}`}
+                          >
                             {step}
                           </p>
                         </div>
                       </div>
-                      
+
                       {/* Completion indicator */}
                       {stepCompleted[index] && (
                         <div className="absolute top-3 right-3 bg-white/30 backdrop-blur-sm px-3 py-1 rounded-full text-white text-xs font-semibold">
@@ -349,7 +365,7 @@ const RecipePage = () => {
                 {/* Complete All Button */}
                 {!allStepsCompleted && steps.length > 0 && (
                   <button
-                  //completes all steps and shows popups
+                    //completes all steps and shows popups
                     onClick={() => {
                       setStepCompleted(steps.map(() => true));
                       setShowPopup(true);
@@ -357,7 +373,7 @@ const RecipePage = () => {
                     }}
                     className="mt-6 w-full py-4 bg-gradient-to-r from-[#6d9851] to-[#5A7A4D] text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
                   >
-                     Mark All Steps as Complete
+                    Mark All Steps as Complete
                   </button>
                 )}
               </div>

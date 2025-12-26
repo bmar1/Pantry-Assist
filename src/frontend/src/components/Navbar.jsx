@@ -5,11 +5,17 @@
  * for settings and logging out. The navbar can be expanded or collapsed.
  */
 
-import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Link, useNavigate } from 'react-router-dom';
 
-export default function Nav({ isNavVisible, setIsNavVisible, setShowSettings, handleLogout, progress }) {
+export default function Nav({
+  isNavVisible,
+  setIsNavVisible,
+  setShowSettings,
+  handleLogout,
+  progress
+}) {
   const navigate = useNavigate();
 
   const showBar = () => {
@@ -25,7 +31,7 @@ export default function Nav({ isNavVisible, setIsNavVisible, setShowSettings, ha
             initial={{ x: -240 }}
             animate={{ x: 0 }}
             exit={{ x: -240 }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
             className="fixed top-0 left-0 h-screen w-60 bg-[#628d45] text-white flex flex-col p-4 z-40"
           >
             {/* Main nav links */}
@@ -34,11 +40,7 @@ export default function Nav({ isNavVisible, setIsNavVisible, setShowSettings, ha
                 className="p-3 rounded-lg hover:bg-[#A8C995] transition-colors duration-200 flex items-center justify-center"
                 onClick={showBar}
               >
-                <img
-                  src="/icons/bar.jpg"
-                  alt="Menu"
-                  className="w-5 h-5"
-                />
+                <img src="/icons/bar.jpg" alt="Menu" className="w-5 h-5" />
               </button>
             </div>
 
@@ -81,7 +83,7 @@ export default function Nav({ isNavVisible, setIsNavVisible, setShowSettings, ha
               </Link>
 
               <Link
-                to="/analytics" 
+                to="/analytics"
                 className="flex items-center gap-3 hover:bg-[#94bf7f] p-2 rounded-lg font-medium"
               >
                 <img src="/icons/result.png" alt="analytics" className="w- h-5 ml-[2px]"></img>
@@ -90,9 +92,7 @@ export default function Nav({ isNavVisible, setIsNavVisible, setShowSettings, ha
             </div>
 
             <div className="rounded-xl bg-slate-200 p-4">
-              <h2 className="text-base font-semibold text-black mb-2">
-                Calories Remaining: 1200
-              </h2>
+              <h2 className="text-base font-semibold text-black mb-2">Calories Remaining: 1200</h2>
               <div className="w-full bg-gray-300 rounded-full h-4 overflow-hidden">
                 <div
                   className="bg-[#84dfe2] h-4 rounded-full transition-all duration-300"
