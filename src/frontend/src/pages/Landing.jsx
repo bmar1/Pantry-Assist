@@ -104,7 +104,6 @@ export default function Landing() {
           </div>
         </div>
       </nav>
-
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden bg-[#5A7A4D] text-center py-4">
@@ -137,7 +136,6 @@ export default function Landing() {
           </button>
         </div>
       )}
-
       {/* Hero Section */}
       <div className="flex items-center justify-center min-h-[90vh] px-4">
         <motion.div
@@ -182,9 +180,8 @@ export default function Landing() {
           </div>
         </motion.div>
       </div>
-
       <br></br>
-
+      IM IN THE DEPLOYMENT GNG!!!
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -302,10 +299,8 @@ export default function Landing() {
           </div>
         </div>
       </motion.div>
-
       <br></br>
       <div className="h-32 w-full bg-gradient-to-b from-transparent to-[#f7faf5]" />
-
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -375,7 +370,6 @@ export default function Landing() {
           </div>
         </div>
       </motion.div>
-
       <div className="text-center mb-2 mt-20">
         <div className="inline-block mb-4">
           <span className="bg-gradient-to-r from-[#6d9851] to-[#5A7A4D] text-white px-6 py-2 rounded-full text-sm font-bold tracking-wide">
@@ -438,7 +432,6 @@ export default function Landing() {
           </div>
         </div>
       </div>
-
       {/* ——— Mid-page CTA ——— */}
       <div className="py-20 relative text-center bg-gradient-to-t from-[#f9fbf7] to-[#f0f5ea]">
         {/* Top Glow */}
@@ -464,7 +457,6 @@ export default function Landing() {
           Build My Plan
         </button>
       </div>
-
       {/* SECTION: Popular Meal Plans */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
@@ -541,7 +533,6 @@ export default function Landing() {
           ))}
         </div>
       </motion.div>
-
       {/* Footer */}
       <footer className="bg-[#5A7A4D] text-white py-8 mt-auto">
         <div className="max-w-6xl mx-auto px-8">
