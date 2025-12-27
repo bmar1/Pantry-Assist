@@ -10,6 +10,43 @@ const GroceryListPage = () => {
   const [groceryList, setGroceryList] = useState(() => location.state?.grocery || []);
   const [isLoading, setIsLoading] = useState(() => !location.state?.grocery);
 
+  const openNewTab = (url) => {
+    const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+    if (newWindow) {
+      newWindow.opener = null;
+    }
+  };
+
+  const handleBuyAll = () => {
+    const baseUrl = 'https://affil.walmart.com/cart/addToCart?items=';
+    const itemsParams = groceryList
+      .map((item, index) => {
+        if (!item.productUrl) {
+          console.warn(`Item #${index} has no product_url`);
+          return null;
+        }
+
+        // Matches "items=" OR "items%3D" to find ID
+        const idMatch = item.productUrl.match(/items(?:=|%3D)(\d+)/);
+
+        if (idMatch && idMatch[1]) {
+          return `${idMatch[1]}|1`; //return the id and quantity of 1
+        }
+        return null;
+      })
+      .filter(Boolean)
+      .join(',');
+
+    if (itemsParams) {
+      const finalUrl = `${baseUrl}${itemsParams}`;
+      console.log('Generated Final URL:', finalUrl);
+      openNewTab(finalUrl);
+    } else {
+      console.error('Failed to generate any IDs. Check console logs above.');
+      alert('Could not find any valid items to add.');
+    }
+  };
+
   useEffect(() => {
     if (groceryList === null) {
       navigate('/LoadingScreen', { state: { page: 'grocery' } });
@@ -130,7 +167,10 @@ const GroceryListPage = () => {
               <p className="text-4xl font-bold text-[#6d9851]">${totalPrice.toFixed(2)}</p>
             </div>
 
-            <button className="px-6 py-3 -mb-5 ml-12 bg-[#90c1e0] text-white rounded-xl font-bold text-lg hover:shadow-2xl transition-all duration-300 hover:scale-105">
+            <button
+              className="px-6 py-3 -mb-5 ml-12 bg-[#90c1e0] text-white rounded-xl font-bold text-lg hover:shadow-2xl transition-all duration-300 hover:scale-105"
+              onClick={handleBuyAll}
+            >
               Proceed to Checkout
             </button>
 
