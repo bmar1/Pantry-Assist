@@ -15,7 +15,13 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @Entity
-@Table(name = "ingredients")
+@Table(
+        name = "ingredients",
+        indexes = {
+                @Index(name = "idx_ingredient_name", columnList = "name"),
+                @Index(name = "idx_ingredient_price", columnList = "totalPrice")
+        }
+)
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})

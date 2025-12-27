@@ -64,9 +64,9 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
 
   return (
     <div className="min-h-screen fixed inset-0 backdrop-blur-md z-50 flex items-center justify-center p-4">
-      <div className="bg-green-600 rounded-2xl shadow-2xl p-8 max-w-lg  w-full relative">
+      <div className="bg-[#89a887] rounded-2xl shadow-2xl p-8 max-w-lg  w-full relative">
         <h1 className="text-3xl md:text-4xl font-extrabold text-white text-center mb-8">
-          Let's personalize your meal plan! ✨
+          Let's personalize your meal plan!
         </h1>
 
         <AnimatePresence mode="wait">
@@ -134,9 +134,9 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
                     {/* Quick presets */}
                     <div className="grid grid-cols-3 gap-2 mb-4">
                       {[
-                        { label: '🔥 Cut', value: 1500 },
-                        { label: '🎯 Maintain', value: 2000 },
-                        { label: '💪 Bulk', value: 2500 }
+                        { label: ' Cut', value: 1500 },
+                        { label: ' Maintain', value: 2000 },
+                        { label: ' Bulk', value: 2500 }
                       ].map((preset) => (
                         <button
                           key={preset.value}
@@ -178,14 +178,14 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
                     </div>
 
                     <div className="mt-3 bg-white/10 rounded-lg p-3 text-xs text-white/80">
-                      💡 Most adults need 1800-2500 calories/day
+                      Most adults need 1800-2500 calories/day
                     </div>
                   </div>
                 )}
 
                 {step === 2 && (
                   <div>
-                    <h2 className="text-2xl font-bold mb-2 text-white">Weekly Budget 💰</h2>
+                    <h2 className="text-2xl font-bold mb-2 text-white">Weekly Budget </h2>
                     <p className="text-white/70 text-sm mb-4">
                       We'll find recipes that fit your budget
                     </p>
@@ -277,7 +277,7 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
                           className="w-5 h-5 rounded text-green-600 mr-3"
                         />
                         <div>
-                          <span className="text-white font-semibold">🌱 Vegan</span>
+                          <span className="text-white font-semibold"> Vegan</span>
                           <p className="text-white/60 text-xs">Plant-based only</p>
                         </div>
                       </label>
@@ -324,7 +324,7 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
                       onClick={handleSubmit}
                       className="flex-1 px-4 py-3 rounded-lg bg-white text-green-600 font-bold hover:bg-gray-100 hover:scale-105 transition-all shadow-lg"
                     >
-                      Create My Plan! 🎉
+                      Create My Plan!
                     </button>
                   )}
                 </div>

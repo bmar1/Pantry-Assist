@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -17,7 +18,7 @@ export default function Nav({
   progress
 }) {
   const navigate = useNavigate();
-
+  const [caloriesRemaining, setCaloriesRemaining] = useState(0);
   const showBar = () => {
     setIsNavVisible(!isNavVisible);
   };
@@ -92,7 +93,9 @@ export default function Nav({
             </div>
 
             <div className="rounded-xl bg-slate-200 p-4">
-              <h2 className="text-base font-semibold text-black mb-2">Calories Remaining: 1200</h2>
+              <h2 className="text-base font-semibold text-black mb-2">
+                Calories Remaining: {caloriesRemaining}
+              </h2>
               <div className="w-full bg-gray-300 rounded-full h-4 overflow-hidden">
                 <div
                   className="bg-[#84dfe2] h-4 rounded-full transition-all duration-300"

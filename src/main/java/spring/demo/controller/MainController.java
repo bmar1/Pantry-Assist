@@ -113,12 +113,16 @@ public class MainController {
 
     //Returns all dashboard data
     @GetMapping("/load")
-    public ResponseEntity<DashboardData> loadDashBboard(@AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
+    public ResponseEntity<DashboardData> loadDashboard(@AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
         List<Recipe> selectedMeals = mealPlanService.selectMeals(userDetails, recipieList);
         List<Recipe> randomMeals = mealPlanService.random(userDetails);
         List<Ingredient> groceryList = groceryList(userDetails);
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        Integer progress = mealPlanService.getProgress(user);
+        Integer budget = (int) user.getPreferences().getBudget();
 
-        DashboardData data = new DashboardData(selectedMeals, randomMeals, groceryList);
+        DashboardData data = new DashboardData(selectedMeals, randomMeals, groceryList, progress, budget);
         return ResponseEntity.ok(data);
     }
 

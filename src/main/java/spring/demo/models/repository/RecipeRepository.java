@@ -34,6 +34,11 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     @Query("SELECT ump.recipe FROM UserMealPlan ump WHERE ump.user.id = :userId AND ump.planned = true")
     List<Recipe> findMarkedRecipesByUserId(@Param("userId") Long userId);
 
+    @Query("SELECT SUM(r.calories) FROM UserMealPlan ump " +
+            "JOIN ump.recipe r " +
+            "WHERE ump.user.id = :userId AND ump.eaten = true")
+    Integer findEatenRecipesByUserID(@Param("userId") Long userId);
+
     @Query("SELECT r FROM Recipe r WHERE r.calories IS NULL OR r.calories = 0")
     List<Recipe> findRecipesWithNullOrZeroCalories();
 

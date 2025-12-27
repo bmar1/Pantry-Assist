@@ -59,7 +59,7 @@ public class MealPlanService {
     public ArrayList<Recipe> loadandFilterRecipies(@NotNull User user, ArrayList<Recipe> recipieList, ArrayList<Ingredient> priceList) throws Exception {
 
         //Load recipes by category from the DB
-        List<String> categories = Arrays.asList("Chicken", "Beef", "Seafood", "Vegetarian", "Vegan", "Goat", "Lamb", "Pork", "Breakfast");
+        List<String> categories = Arrays.asList("Chicken", "Beef", "Pork", "Vegetarian", "Vegan", "Breakfast");
         recipieList = (ArrayList<Recipe>) categories.stream()
                 .flatMap(category -> {
                     try {
@@ -73,7 +73,7 @@ public class MealPlanService {
 
 
         //Filter in 3 steps and return final list
-        recipieList = filterByCommonIngredientsOptimized(recipieList, 2);
+        recipieList = filterByCommonIngredientsOptimized(recipieList, 4);
         recipieList = filterByCalories(recipieList, user);
         recipieList = filterByPrice(recipieList, user, priceList);
         return recipieList;
@@ -436,8 +436,8 @@ public class MealPlanService {
 
         int totalCalories = list.stream().mapToInt(Recipe::getCalories).sum();
         //If we are still under our requirements, add a small meal/snack  to fill the diet
-        if (totalCalories < calorie) {
-            int gap = calorie - totalCalories;
+        int gap = calorie - totalCalories;
+        if (gap > 200) {
 
             // Try to find a recipe to fill the calorie gap in memory or from list
             Recipe closestRecipe = null;
@@ -651,7 +651,8 @@ public class MealPlanService {
 
         List<String> commonItems = Arrays.asList("salt", "pepper", "water", "sugar", "oil",
                 "olive oil", "flour", "rice", "baking powder", "soy sauce", "vinegar", "cumin",
-                "butter", "parsley", "garlic", "onion powder", "paprika", "black pepper", "kosher salt");
+                "butter", "parsley", "garlic", "onion powder", "paprika",
+                "black pepper", "kosher salt", "ketchup", "sauce", "sake", "null", "honey", "paneer", "powder", "spice");
 
         for (Recipe recipe : recipieList) {
             // Add to meal plan
@@ -717,7 +718,7 @@ public class MealPlanService {
     public ArrayList<Recipe> filterRecipes(ArrayList<Recipe> recipieList, int maxMealPlanSize, int calories, int meals) {
         //build list of each type, and category
         Map<String, List<String>> categoryMap = Map.of(
-                "meat", Arrays.asList("Chicken", "Beef", "Seafood", "Pork"),
+                "meat", Arrays.asList("Chicken", "Beef"),
                 "veg", Arrays.asList("Vegetarian", "Vegan"),
                 "carb", Arrays.asList("Breakfast")
         );
@@ -761,5 +762,23 @@ public class MealPlanService {
         }
 
         return new ArrayList<>(filtered);
+    }
+
+    public Integer getProgress(User user) {
+        int calories = user.getPreferences().getCalories();
+
+        // Query db for eaten calories
+        Integer eatenCalories = recipeRepository.findEatenRecipesByUserID(user.getId());
+
+        // Handle null case (no eaten meals yet)
+        if (eatenCalories == null || eatenCalories == 0) {
+            return 0;
+        }
+
+        if (calories == 0) {
+            return 0;
+        }
+
+        return Math.toIntExact(Math.round(((float) eatenCalories / calories) * 100));
     }
 }

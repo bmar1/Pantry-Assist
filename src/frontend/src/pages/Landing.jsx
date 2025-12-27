@@ -386,7 +386,7 @@ export default function Landing() {
       </div>
       <div className="min-h-screen bg-white text-white flex justify-center py-20 px-4">
         <div className="w-full max-w-5xl relative">
-          <div className="absolute left-1/2 transform -translate-x-1/2 top-0 bottom-0 w-px bg-gray-800" />
+          <div className="absolute left-1/2 transform -translate-x-1/2 top-0 bottom-8 w-px bg-gray-800" />
           <div className="space-y-24">
             {steps.map((step, index) => {
               const isEven = index % 2 === 0;

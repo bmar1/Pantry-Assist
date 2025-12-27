@@ -33,9 +33,10 @@ export default function Dashboard() {
   const [isGroceryLoading, setIsGroceryLoading] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
-  const [progress, setProgress] = useState(40);
+  const [progress, setProgress] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shouldNavigate, setShouldNavigate] = useState(false);
+  const [budget, setBudget] = useState(0);
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/');
@@ -74,6 +75,7 @@ export default function Dashboard() {
   //loads all relevant data to page
   const loadDashboardData = async () => {
     setIsLoading(true);
+    console.log(localStorage.getItem('token'));
     try {
       const response = await fetch(`http://localhost:8080/api/load`, {
         method: 'GET',
@@ -107,20 +109,68 @@ export default function Dashboard() {
       localStorage.setItem('previousMealNames', currentMealNames);
 
       setMeals(data.selectedMeals);
+      setProgress(data.progress);
+      setBudget(data.budget);
       setMealPreview(data.randomMeals);
-      const seenNames = new Set();
-      const uniqueList = data.groceryList.filter((item) => {
-        const isDuplicate = seenNames.has(item.name);
-        seenNames.add(item.name);
-        return !isDuplicate;
+      const getNormalizedWords = (name) => {
+        if (!name) return [];
+        return name
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z\s]/g, '')
+          .split(/\s+/)
+          .filter((word) => word.length > 2)
+          .map((word) => word.replace(/s$/, '').replace(/es$/, ''));
+      };
+
+      // Helper function to calculate similarity between two items
+      const getSimilarityScore = (name1, name2) => {
+        const words1 = getNormalizedWords(name1);
+        const words2 = getNormalizedWords(name2);
+
+        if (words1.length === 0 || words2.length === 0) return 0;
+
+        const matches = words1.filter((word) => words2.includes(word)).length;
+        const totalWords = Math.max(words1.length, words2.length);
+
+        return matches / totalWords;
+      };
+
+      const filteredList = [];
+      const seenItems = [];
+
+      data.groceryList.forEach((item) => {
+        if (!item || !item.name || item.name.toLowerCase() === 'null') {
+          return; // Skip invalid items
+        }
+
+        const normalizedName = item.name.toLowerCase().trim();
+
+        // Check if this item is similar to any already seen item
+        const isSimilar = seenItems.some((seenItem) => {
+          const similarity = getSimilarityScore(normalizedName, seenItem.name);
+          // If 50% or more words match, consider it a duplicate
+          return similarity >= 0.5;
+        });
+
+        if (!isSimilar) {
+          filteredList.push(item);
+          seenItems.push({ name: normalizedName, original: item });
+        }
       });
-      setGrocery(uniqueList);
+
+      console.log(
+        `Fuzzy filtered grocery list: ${data.groceryList.length} -> ${filteredList.length} items`
+      );
+
+      setGrocery(filteredList);
       setIsGroceryLoading(false);
       setGroceryPreview(data.groceryList.slice(0, 3));
     } catch (error) {
       console.error('Error loading dashboard data:', error);
       setMeals([]);
       setMealPreview([]);
+      setProgress(0);
       setGrocery([]);
       setGroceryPreview([]);
     } finally {
@@ -292,7 +342,7 @@ export default function Dashboard() {
                 Savings
               </h2>
               <div className="flex items-baseline gap-1">
-                <span className="text-5xl font-black">$25</span>
+                <span className="text-5xl font-black">${95 - budget}</span>
                 <span className="text-[#628d45] font-bold">.00</span>
               </div>
               <p className="text-gray-400 text-sm mt-1">Automatically saved this week</p>

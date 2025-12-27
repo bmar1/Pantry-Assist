@@ -9,7 +9,14 @@ import lombok.Setter;
 
 @Data
 @Entity
-@Table(name = "recipes")
+@Table(name = "recipes",
+indexes = {
+    @Index(name = "idx_recipe_name", columnList = "name"),
+    @Index(name = "idx_recipe_calories", columnList = "calories"),
+    @Index(name = "idx_recipe_category", columnList = "category"),
+    @Index(name = "idx_recipe_meal_cost", columnList = "mealCost"),
+    @Index(name = "idx_recipe_calories_category", columnList = "calories, category")
+    })
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Recipe {
 

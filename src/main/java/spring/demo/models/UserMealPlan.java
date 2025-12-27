@@ -5,7 +5,18 @@ import jakarta.persistence.*;
 
 
 @Entity
-@Table(name = "user_meal_plans")
+@Table(
+        name = "user_meal_plans",
+        indexes = {
+                @Index(name = "idx_ump_user_id", columnList = "user_id"),
+                @Index(name = "idx_ump_recipe_id", columnList = "recipe_id"),
+                @Index(name = "idx_ump_planned", columnList = "planned"),
+                @Index(name = "idx_ump_eaten", columnList = "eaten"),
+                @Index(name = "idx_ump_user_planned", columnList = "user_id, planned"),
+                @Index(name = "idx_ump_user_eaten", columnList = "user_id, eaten"),
+                @Index(name = "idx_ump_user_recipe", columnList = "user_id, recipe_id")
+        }
+)
 public class UserMealPlan {
 
     @Id
