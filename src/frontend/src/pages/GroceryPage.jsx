@@ -57,7 +57,7 @@ const GroceryListPage = () => {
     const loadGrocery = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`http://localhost:8080/api/meals/groceryList`, {
+        const response = await fetch(`api/meals/groceryList`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
