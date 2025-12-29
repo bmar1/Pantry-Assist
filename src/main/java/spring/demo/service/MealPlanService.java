@@ -321,10 +321,21 @@ public class MealPlanService {
     }
 
     // Helper method to determine unit type for logging
-    private String getUnitType(String amount) {
-        if (amount.contains("g") || amount.contains("kg")) return "grams";
-        if (amount.contains("ml") || amount.contains("l") || amount.contains("fl oz")) return "ml";
-        if (amount.contains("tsp") || amount.contains("tbsp")) return "tsp";
+    public String getUnitType(String amount) {
+        String lower = amount.toLowerCase().trim();
+
+        if (lower.endsWith("g") || lower.endsWith("kg") || lower.contains(" g") || lower.contains(" kg")) {
+            return "grams";
+        }
+
+        if (lower.endsWith("ml") || lower.endsWith("l") || lower.contains("fl oz")) {
+            return "ml";
+        }
+
+        if (lower.endsWith("tsp") || lower.endsWith("tbsp") || lower.contains(" tsp") || lower.contains(" tbsp")) {
+            return "tsp";
+        }
+
         return "count";
     }
 

@@ -82,7 +82,11 @@ public class MainController {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        // Update preferences
+        if(pref.getCalories() == 0 || pref.getBudget() == 0){
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Update preferences if OK
         user.setPreferences(pref);
 
         //Return filtered list after onboarding
@@ -92,28 +96,34 @@ public class MainController {
             e.printStackTrace();
         }
         //Save new ingredients
-        for (Ingredient ingredient : priceList) {
-            ingredientRepository.save(ingredient);
+        if(!priceList.isEmpty()) {
+            for (Ingredient ingredient : priceList) {
+                ingredientRepository.save(ingredient);
 
+            }
         }
+
         user.getGroceryList().clear();
         user.getMealPlans().clear();
 
         int MAX_MEAL_PLAN_SIZE = (user.getPreferences().getMeals() * 7);
         if(recipieList.size() > MAX_MEAL_PLAN_SIZE){
-            //filter existing recipes further, to save ingredients
+            //filter existing recipes further, to save ingredients, saving cost
             recipieList = mealPlanService.filterRecipes(recipieList, MAX_MEAL_PLAN_SIZE,
                     user.getPreferences().getCalories(), user.getPreferences().getMeals());
         }
 
         mealPlanService.findAndSaveMealPlan(user, recipieList, priceList);
         userRepository.save(user);
-        return ResponseEntity.ok(recipieList);
+        if(recipieList.isEmpty() || recipieList.size() < 13){
+            return ResponseEntity.status(500).build();
+        }
+        else return ResponseEntity.ok(recipieList);
     }
 
     //Returns all dashboard data
     @GetMapping("/load")
-    public ResponseEntity<DashboardData> loadDashboard(@AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
+    public ResponseEntity<?> loadDashboard(@AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
         List<Recipe> selectedMeals = mealPlanService.selectMeals(userDetails, recipieList);
         List<Recipe> randomMeals = mealPlanService.random(userDetails);
         List<Ingredient> groceryList = groceryList(userDetails);
@@ -121,6 +131,11 @@ public class MainController {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         Integer progress = mealPlanService.getProgress(user);
         Integer budget = (int) user.getPreferences().getBudget();
+
+        //check data
+        if(selectedMeals.isEmpty() || randomMeals.isEmpty() || groceryList.isEmpty() || budget == 0){
+            return ResponseEntity.status(500).build();
+        }
 
         DashboardData data = new DashboardData(selectedMeals, randomMeals, groceryList, progress, budget);
         return ResponseEntity.ok(data);
@@ -136,6 +151,9 @@ public class MainController {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
+        if(pref.getCalories() == 0 || pref.getBudget() == 0){
+            return ResponseEntity.badRequest().build();
+        }
 
         // Update preferences
         user.setPreferences(pref);
@@ -183,7 +201,7 @@ public class MainController {
         } else {
             log.warn("No PLANNED meal found with recipe name: '{}'", name);
 
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            return ResponseEntity.status(404)
                     .body(Map.of(
                             "success", false,
                             "error", "Planned meal not found for recipe: " + name
@@ -200,6 +218,9 @@ public class MainController {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         List<Recipe> userRecipes = recipeRepository.findRecipesByUserId(user.getId());
+        if(!userRecipes.isEmpty()){
+            return ResponseEntity.status(404).build();
+        }
         return ResponseEntity.ok(userRecipes);
     }
 
@@ -224,13 +245,12 @@ public class MainController {
 
         // Search DB if not found locally
         if (recipe.isEmpty()) {
-            recipe = user.getMealPlans().stream()
-                    .map(UserMealPlan::getRecipe)
-                    .filter(r -> r.getName().equalsIgnoreCase(name))
-                    .findFirst();
+            recipe = recipeRepository.findByNameIgnoreCase(name);
         }
 
-        return ResponseEntity.ok(recipe.get());
+        if(!recipe.isEmpty())
+            return ResponseEntity.ok(recipe.get());
+        else return ResponseEntity.status(404).build();
     }
     @GetMapping("/meals/groceryList")
     public List<Ingredient> groceryList(@AuthenticationPrincipal UserDetails userDetails) {
@@ -242,6 +262,10 @@ public class MainController {
         List<Ingredient> ingredients = user.getGroceryList().stream()
                 .map(UserIngredient::getIngredient)
                 .toList();
+
+        if(!ingredients.isEmpty()) {
+            return new ArrayList<>();
+        }
 
         return ingredients;
     }

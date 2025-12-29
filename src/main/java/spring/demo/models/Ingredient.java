@@ -23,7 +23,6 @@ import java.time.LocalDateTime;
         }
 )
 @NoArgsConstructor
-@AllArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Ingredient {
 
@@ -133,5 +132,9 @@ public class Ingredient {
 
     public String getServingsPerContainer() {
         return servingsPerContainer;
+    }
+
+    public void setPrice(double v) {
+        this.totalPrice = v;
     }
 }
