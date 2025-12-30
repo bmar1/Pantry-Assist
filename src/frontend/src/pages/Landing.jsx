@@ -49,7 +49,7 @@ export default function Landing() {
         {/* Left Side Group */}
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-5">
-            <img src="/favicon.png" className="w-auto h-12 sm:h-14" alt="Logo" />
+            <img src="/favicon-v1.png" className="w-auto h-12 sm:h-14" alt="Logo" />
             <h2 className="text-white text-lg sm:text-xl font-semibold">Plated</h2>
           </div>
           <button

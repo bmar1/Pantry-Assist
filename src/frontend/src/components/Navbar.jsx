@@ -48,7 +48,7 @@ export default function Nav({
             <div className="flex flex-col space-y-4 mb-10">
               <div className="flex flex-col items-start w-full -mt-10">
                 <img
-                  src="/favicon.png"
+                  src="/favicon-v1.png"
                   alt="PLated Logo"
                   className="w-[8rem] h-[6.5rem] object-contain"
                 />
