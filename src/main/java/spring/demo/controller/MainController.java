@@ -218,7 +218,7 @@ public class MainController {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         List<Recipe> userRecipes = recipeRepository.findRecipesByUserId(user.getId());
-        if(!userRecipes.isEmpty()){
+        if(userRecipes.isEmpty()){
             return ResponseEntity.status(404).build();
         }
         return ResponseEntity.ok(userRecipes);

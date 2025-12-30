@@ -17,7 +17,7 @@ export default function AuthForm() {
     e.preventDefault();
 
     const endpoint = isLogin ? 'login' : 'signup';
-    const url = `api/auth/${endpoint}`;
+    const url = `/api/auth/${endpoint}`;
     let res;
     res = await fetch(url, {
       method: 'POST',
@@ -58,10 +58,10 @@ export default function AuthForm() {
             className="w-32 h-32 md:w-48 md:h-48 object-contain mb-4 md:mb-6"
           />
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 md:mb-3">
-            Welcome to Pantry Assist
+            Welcome to Plated
           </h2>
           <p className="text-sm sm:text-base md:text-lg">
-            Your smart solution for grocery management.
+            Well-planned meals, without overspending
           </p>
         </div>
 

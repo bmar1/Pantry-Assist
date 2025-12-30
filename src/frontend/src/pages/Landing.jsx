@@ -48,9 +48,9 @@ export default function Landing() {
       <nav className="bg-gradient-to-b from-[#618c45] to-[#5A7A4D] shadow-md px-4 sm:px-8 py-4 flex items-center justify-between">
         {/* Left Side Group */}
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-5">
             <img src="/favicon.png" className="w-auto h-12 sm:h-14" alt="Logo" />
-            <h2 className="text-white text-lg sm:text-xl font-semibold">Pantry Assist</h2>
+            <h2 className="text-white text-lg sm:text-xl font-semibold">Plated</h2>
           </div>
           <button
             onClick={() => navigate('/About')}
@@ -153,9 +153,9 @@ export default function Landing() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-5xl md:text-5xl lg:text-8xl font-[500] mb-6 text-[#fffefa] leading-tight"
             >
-              Meal and budget
+              Meal planning and
               <br></br>
-              tracking, made easy
+              budget tracking, made easy
             </motion.h1>
 
             <motion.p

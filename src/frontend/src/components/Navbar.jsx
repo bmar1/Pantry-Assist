@@ -49,11 +49,11 @@ export default function Nav({
               <div className="flex flex-col items-start w-full -mt-10">
                 <img
                   src="/favicon.png"
-                  alt="Pantry Assist Logo"
-                  className="w-[7.75rem] h-[7.75rem] object-contain"
+                  alt="PLated Logo"
+                  className="w-[8rem] h-[6.5rem] object-contain"
                 />
-                <h1 className="text-3xl font-semibold text-white tracking-wide mt-2">
-                  Pantry Assist
+                <h1 className="text-3xl font-semibold text-white tracking-wide mt-4 ml-4">
+                  Plated
                 </h1>
               </div>
             </div>

@@ -1,5 +1,6 @@
 package spring.demo.controller;
 
+import jakarta.transaction.Transactional;
 import org.apache.catalina.Store;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import spring.demo.models.Ingredient;
-import spring.demo.models.User;
-import spring.demo.models.UserIngredient;
+import spring.demo.models.*;
 import spring.demo.models.repository.IngredientRepository;
+import spring.demo.models.repository.RecipeRepository;
 import spring.demo.models.repository.UserRepository;
 
 import java.util.ArrayList;
@@ -42,6 +42,9 @@ public class IntegrationTests {
     @Autowired
     private IngredientRepository ingredientRepository;
 
+    @Autowired
+    private RecipeRepository recipeRepository;
+
 
 
     @Test
@@ -67,7 +70,7 @@ public class IntegrationTests {
     @WithMockUser(username = "test@example.com") //test acc
     void shouldReturnGroceryList() throws Exception {
 
-        Optional<User> user = userRepository.findByEmail("bilalutwo@example.com");
+        Optional<User> user = userRepository.findByEmail("test@example.com");
 
         Ingredient ingredient = new Ingredient();
         ingredient.setName("Beef");
@@ -89,6 +92,58 @@ public class IntegrationTests {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(1));
     }
+
+    @Test
+    @WithMockUser(username = "test@example.com") //test acc
+    @Transactional
+    void shouldReturnAllMeals() throws Exception {
+
+        Optional<User> user = userRepository.findByEmail("test@example.com");
+
+        Recipe recipe = new Recipe();
+        recipe.setName("Beef Stroganoffs");
+        recipe.setCalories(412);
+        recipeRepository.save(recipe);
+
+        UserMealPlan ump = new UserMealPlan();
+        ump.setUser(user.get());
+        ump.setRecipe(recipe);
+        List<UserMealPlan> list = new ArrayList<UserMealPlan>();
+        list.add(ump);
+
+        Recipe recipe2 = new Recipe();
+        recipe2.setName("Beef Qeema");
+        recipe2.setCalories(412);
+        recipeRepository.save(recipe2);
+
+        UserMealPlan ump1 = new UserMealPlan();
+        ump1.setUser(user.get());
+        ump1.setRecipe(recipe2);
+        list.add(ump1);
+
+
+        user.get().setMealPlans(list);
+        userRepository.save(user.get());
+
+
+        mockMvc.perform(get("/api/meals/allMeals"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(2));
+    }
+
+    @Test
+    @WithMockUser(username = "test@example.com") //test acc
+    @Transactional
+    void shouldReturnAllMeal404() throws Exception {
+
+        Optional<User> user = userRepository.findByEmail("test@example.com");
+
+        mockMvc.perform(get("/api/meals/allMeals"))
+                .andExpect(status().isNotFound());
+    }
+
+
 
     @Test
     void shouldReturn403WithoutAuth() throws Exception {
