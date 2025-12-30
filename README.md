@@ -1,4 +1,4 @@
-# 🥫 Pantry-Assist
+# **Plated**
 A full-stack application aimed to help you save food, tighten your budget, and plan interesting, tasteful meals from around the world! 🌎✨
 
 ![Build Status](https://github.com/bmar1/Pantry-Assist/workflows/Deploy%20to%20EC2/badge.svg)
@@ -16,7 +16,7 @@ A full-stack application aimed to help you save food, tighten your budget, and p
 
 
 ##  Objective
-This project aims to serve those who are on a budget or want help tracking what they eat — from calories to trying new foods — all in a way that’s easy to manage through the app, so you can spend more time doing what’s important to you!
+This project, 'plated' aims to serve those who are on a budget or want help tracking what they eat — from calories to trying new foods — all in a way that’s easy to manage through the app, so you can spend more time doing what’s important to you!
 
 ---
 
@@ -57,7 +57,7 @@ We offer an easy UI to navigate through to help you day-by-day to cook, and plan
 ### 🌐 No need to worry!
 Feel free to refer to the website currently, hosted full-stack on AWS EC2!
 
-**http://3.94.144.194/landing**
+**http://44.200.225.217/landing**
 
 Frontend Only Host:
 https://pantry-assist.vercel.app/landing
