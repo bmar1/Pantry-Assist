@@ -301,4 +301,7 @@ public class Recipe {
     }
 
 
+    public void setId(long l) {
+        this.id = l;
+    }
 }

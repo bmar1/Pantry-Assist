@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -31,7 +32,7 @@ public class IntegrationTests {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    private MockMvc mockMvc;  // Use MockMvc instead of TestRestTemplate
+    private MockMvc mockMvc;
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -72,10 +73,10 @@ public class IntegrationTests {
 
         Optional<User> user = userRepository.findByEmail("test@example.com");
 
-        Ingredient ingredient = new Ingredient();
-        ingredient.setName("Beef");
+        Ingredient ingredient = new Ingredient("Beef" + System.currentTimeMillis());
+        ingredient.setName("Beef" + System.currentTimeMillis());
         ingredient.setPrice(5.94);
-        ingredientRepository.save(ingredient);
+        ingredient = ingredientRepository.save(ingredient);
 
         UserIngredient userIngredient = new UserIngredient();
         userIngredient.setUser(user.get());
@@ -133,6 +134,70 @@ public class IntegrationTests {
     }
 
     @Test
+    @WithMockUser(username = "test@example.com")
+    @Transactional
+    void shouldUpdateMealSuccessfully() throws Exception {
+        // Given - Create user with a planned meal
+        User user = userRepository.findByEmail("test@example.com")
+                .orElseThrow();
+
+        Recipe recipe = new Recipe();
+        recipe.setName("Beef Stroganoff");
+        recipe.setCalories(412);
+        recipe = recipeRepository.save(recipe);
+
+        UserMealPlan mealPlan = new UserMealPlan();
+        mealPlan.setUser(user);
+        mealPlan.setRecipe(recipe);
+        mealPlan.setPlanned(true);
+        mealPlan.setEaten(false);
+        user.getMealPlans().add(mealPlan);
+        userRepository.save(user);
+
+        mockMvc.perform(put("/api/meals/updateMeal")
+                        .param("name", "Beef Stroganoff"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Meal marked as eaten"))
+                .andExpect(jsonPath("$.recipe").value("Beef Stroganoff"))
+                .andExpect(jsonPath("$.mealPlanId").exists());
+    }
+
+    @Test
+    @WithMockUser(username = "test@example.com")
+    @Transactional
+    void shouldReturn404WhenMealNotFound() throws Exception {
+        // Given - User exists but has no meal plans with that name
+        User user = userRepository.findByEmail("test@example.com")
+                .orElseThrow();
+
+        // When & Then - Request different meal name
+        mockMvc.perform(put("/api/meals/updateMeal")
+                        .param("name", "NonExistentMeal"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test
+    @WithMockUser(username = "test@example.com")
+    void shouldReturn400WhenNameParameterMissing() throws Exception {
+        // When & Then - No name parameter provided
+        mockMvc.perform(put("/api/meals/updateMeal"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "test@example.com")
+    @Transactional
+    void shouldReturn400WhenNameParameterIsBlank() throws Exception {
+        // When & Then - Blank name parameter
+        mockMvc.perform(put("/api/meals/updateMeal")
+                        .param("name", ""))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
     @WithMockUser(username = "test@example.com") //test acc
     @Transactional
     void shouldReturnAllMeal404() throws Exception {
@@ -153,8 +218,13 @@ public class IntegrationTests {
     }
 
     @Test
-    @WithMockUser(username = "test@example.com")
+    @WithMockUser(username = "test1@example.com")
     void shouldReturnEmptyList() throws Exception {
+
+        User user = new User();
+        user.setEmail("test1@example.com");
+
+        userRepository.save(user);
         mockMvc.perform(get("/api/meals/groceryList"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())

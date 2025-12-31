@@ -125,7 +125,7 @@ public class MainController {
     @GetMapping("/load")
     public ResponseEntity<?> loadDashboard(@AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
         List<Recipe> selectedMeals = mealPlanService.selectMeals(userDetails, recipieList);
-        List<Recipe> randomMeals = mealPlanService.random(userDetails);
+        List<Recipe> randomMeals = mealPlanService.random();
         List<Ingredient> groceryList = groceryList(userDetails);
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -167,6 +167,14 @@ public class MainController {
     public ResponseEntity<?> updateMeal(
             @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam(required = true) String name) {
+
+        if (name == null || name.isBlank()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of(
+                            "success", false,
+                            "message", "Meal name is required"
+                    ));
+        }
 
         String username = userDetails.getUsername();
 
@@ -263,7 +271,7 @@ public class MainController {
                 .map(UserIngredient::getIngredient)
                 .toList();
 
-        if(!ingredients.isEmpty()) {
+        if(ingredients.isEmpty()) {
             return new ArrayList<>();
         }
 

@@ -713,12 +713,7 @@ public class MealPlanService {
     }
 
     //Returns a random meal from a query
-    public List<Recipe> random(@AuthenticationPrincipal UserDetails userDetails) {
-        String email = userDetails.getUsername();
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
+    public List<Recipe> random() {
         int req = 2;
         List<Recipe> subList = recipeRepository.findRandomRecipes(req);
 
