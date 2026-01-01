@@ -77,7 +77,7 @@ We offer an easy UI to navigate through to help you day-by-day to cook, and plan
 ### 🌐 No need to worry!
 Feel free to refer to the website currently, hosted full-stack on AWS EC2!
 
-**http://44.200.225.217/landing**
+**http://98.95.234.205/landing**
 
 Frontend Only Host:
 https://pantry-assist.vercel.app/landing
