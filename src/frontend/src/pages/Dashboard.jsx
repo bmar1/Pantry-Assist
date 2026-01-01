@@ -75,7 +75,7 @@ export default function Dashboard() {
   //loads all relevant data to page
   const loadDashboardData = async () => {
     setIsLoading(true);
-    console.log(localStorage.getItem('token'));
+
     try {
       const response = await fetch(`api/load`, {
         method: 'GET',

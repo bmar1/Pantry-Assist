@@ -198,7 +198,7 @@ const About = () => {
             <div>
               <div className="flex items-center gap-3 mb-4">
                 <img src="/favicon-v1.png" className="w-10 h-10" alt="Logo" />
-                <h3 className="text-xl font-semibold">Pantry Assist</h3>
+                <h3 className="text-xl font-semibold">Plated</h3>
               </div>
               <p className="text-sm text-gray-200">
                 Plan meals, track calories, and save money effortlessly.
@@ -251,7 +251,7 @@ const About = () => {
             </div>
           </div>
           <div className="border-t border-gray-400 pt-6 flex justify-between items-center text-sm text-gray-200">
-            <p>© 2025 Pantry Assist. All rights reserved.</p>
+            <p>© 2026 Plated. All rights reserved.</p>
             <div className="flex gap-4">
               <a href="#" className="hover:text-white">
                 Twitter

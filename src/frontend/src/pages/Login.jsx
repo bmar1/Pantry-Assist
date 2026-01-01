@@ -68,7 +68,7 @@ export default function AuthForm() {
         {/* Right side - Login/Signup form */}
         <div className="p-6 sm:p-8 md:p-10 w-full md:w-1/2 bg-white">
           <h1 className="text-3xl sm:text-4xl font-bold text-[#334924] text-center mb-2 sm:mb-3">
-            Pantry Assist
+            Plated
           </h1>
           <h2 className="text-base sm:text-lg md:text-xl text-gray-700 text-center mb-6 sm:mb-8">
             {isLogin ? 'Welcome back!' : 'Create your account'}

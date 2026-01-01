@@ -58,7 +58,7 @@ const RecipePage = () => {
       try {
         setLoading(true);
         const encodedName = encodeURIComponent(name);
-        const response = await fetch(`http://localhost:8080/api/meal?name=${encodedName}`, {
+        const response = await fetch(`/api/meal?name=${encodedName}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',

@@ -17,6 +17,85 @@ const GroceryListPage = () => {
     }
   };
 
+  const loadGrocery = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`api/meals/groceryList`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        const uniqueList = deduplicateItems(data);
+
+        setGroceryList(uniqueList);
+      } else {
+        console.error('Failed to load grocery list:', response.status);
+        setGroceryList([]);
+      }
+    } catch (error) {
+      console.error('Error loading grocery list:', error);
+      setGroceryList([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getNormalizedWords = (name) => {
+    if (!name) return [];
+    return name
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z\s]/g, '')
+      .split(/\s+/)
+      .filter((word) => word.length > 2)
+      .map((word) => word.replace(/s$/, '').replace(/es$/, ''));
+  };
+
+  const getSimilarityScore = (name1, name2) => {
+    const words1 = getNormalizedWords(name1);
+    const words2 = getNormalizedWords(name2);
+
+    if (words1.length === 0 || words2.length === 0) return 0;
+
+    const matches = words1.filter((word) => words2.includes(word)).length;
+    const totalWords = Math.max(words1.length, words2.length);
+
+    return matches / totalWords;
+  };
+
+  const deduplicateItems = (items) => {
+    const filteredList = [];
+    const seenItems = [];
+
+    items.forEach((item) => {
+      if (!item || !item.name || item.name.toLowerCase() === 'null') {
+        return; // Skip invalid items
+      }
+
+      const normalizedName = item.name.toLowerCase().trim();
+
+      // Check if this item is similar to any already seen item
+      const isSimilar = seenItems.some((seenItem) => {
+        const similarity = getSimilarityScore(normalizedName, seenItem.name);
+        // If 50% or more words match, consider it a duplicate
+        return similarity >= 0.5;
+      });
+
+      if (!isSimilar) {
+        filteredList.push(item);
+        seenItems.push({ name: normalizedName, original: item });
+      }
+    });
+
+    return filteredList;
+  };
+
   const handleBuyAll = () => {
     const baseUrl = 'https://affil.walmart.com/cart/addToCart?items=';
     const itemsParams = groceryList
@@ -54,40 +133,6 @@ const GroceryListPage = () => {
   }, [groceryList, navigate]);
 
   useEffect(() => {
-    const loadGrocery = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch(`api/meals/groceryList`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-
-          const seenNames = new Set();
-          const uniqueList = data.filter((item) => {
-            const isDuplicate = seenNames.has(item.name);
-            seenNames.add(item.name);
-            return !isDuplicate;
-          });
-
-          setGroceryList(uniqueList);
-        } else {
-          console.error('Failed to load grocery list:', response.status);
-          setGroceryList([]);
-        }
-      } catch (error) {
-        console.error('Error loading grocery list:', error);
-        setGroceryList([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     if (!location.state?.grocery && (!groceryList || groceryList.length === 0)) {
       loadGrocery();
     }
