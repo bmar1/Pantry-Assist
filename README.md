@@ -46,7 +46,7 @@ Currently, plated is only hosted with EC2, full stack, however if you'd run it y
 
   ### 💻 To run it locally:
 ```bash
-git clone https://github.com/bmar1/Pantry-Assist.git
+git clone https://github.com/bmar1/Plated.git
 npm install
 npm start
 ```
