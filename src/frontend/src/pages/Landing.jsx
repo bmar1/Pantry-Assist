@@ -539,7 +539,7 @@ export default function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-6">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <img src="/favicon.png" className="w-10 h-10" alt="Logo" />
+                <img src="/favicon-v1.png" className="w-10 h-10" alt="Logo" />
                 <h3 className="text-xl font-semibold">Pantry Assist</h3>
               </div>
               <p className="text-sm text-gray-200">

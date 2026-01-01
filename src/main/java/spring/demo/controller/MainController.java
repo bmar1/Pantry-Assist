@@ -82,7 +82,7 @@ public class MainController {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        if(pref.getCalories() == 0 || pref.getBudget() == 0){
+        if(pref.getCalories() == 0 || pref.getBudget() == 0 || pref.getMeals() <= 1){
             return ResponseEntity.badRequest().build();
         }
 
@@ -94,6 +94,7 @@ public class MainController {
             recipieList = mealPlanService.loadandFilterRecipies(user, recipieList, priceList);
         } catch (Exception e) {
             e.printStackTrace();
+            return ResponseEntity.status(500).build();
         }
         //Save new ingredients
         if(!priceList.isEmpty()) {

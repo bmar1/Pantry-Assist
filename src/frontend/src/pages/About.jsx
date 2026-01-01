@@ -18,8 +18,8 @@ const About = () => {
         {/* Left Side Group */}
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
-            <img src="/favicon.png" className="w-auto h-12 sm:h-14" alt="Logo" />
-            <h2 className="text-white text-lg sm:text-xl font-semibold">Pantry Assist</h2>
+            <img src="/favicon-v1.png" className="w-auto h-12 sm:h-14" alt="Logo" />
+            <h2 className="text-white text-lg sm:text-xl font-semibold">Plated</h2>
           </div>
           <button
             onClick={() => handleNavigation('/landing')}
@@ -122,7 +122,7 @@ const About = () => {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-5xl md:text-7xl font-bold text-white text-center leading-tight"
           >
-            About PantryAssist
+            About Plated
           </motion.h1>
         </div>
       </motion.div>
@@ -138,10 +138,10 @@ const About = () => {
         >
           <h2 className="text-4xl font-semibold text-[#5A7A4D] mb-4">Our Mission</h2>
           <p className="text-lg text-gray-700">
-            At PantryAssist, our mission is to simplify your life by revolutionizing meal planning
-            and pantry management. We believe that everyone deserves to eat well without the stress
-            of wondering what to cook or wasting food. Our platform empowers you to save money,
-            reduce food waste, and enjoy delicious, home-cooked meals with ease.
+            At Plated, the mission is to simplify your life by revolutionizing meal planning and
+            pantry management. Everyone deserves to eat well without the stress of wondering what to
+            cook or wasting food. Our platform empowers you to save money, reduce food waste, and
+            enjoy delicious, home-cooked meals with ease.
           </p>
         </motion.section>
 
@@ -183,10 +183,10 @@ const About = () => {
         >
           <h2 className="text-4xl font-semibold text-[#5A7A4D] mb-4">Our Story</h2>
           <p className="text-lg text-gray-700">
-            Founded by a team of passionate foodies and tech enthusiasts, PantryAssist was born from
-            a simple idea: to make meal planning effortless and accessible for everyone. We were
-            tired of the daily struggle of deciding what to eat and the guilt of wasting forgotten
-            ingredients. We knew there had to be a better way, and so, PantryAssist was created.
+            Founded by a team of passionate foodies and tech enthusiasts, Plated was born from a
+            simple idea: to make meal planning effortless and accessible for everyone. We were tired
+            of the daily struggle of deciding what to eat and the guilt of wasting forgotten
+            ingredients. We knew there had to be a better way, and so, Plated was created.
           </p>
         </motion.section>
       </div>
@@ -197,7 +197,7 @@ const About = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-6">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <img src="/favicon.png" className="w-10 h-10" alt="Logo" />
+                <img src="/favicon-v1.png" className="w-10 h-10" alt="Logo" />
                 <h3 className="text-xl font-semibold">Pantry Assist</h3>
               </div>
               <p className="text-sm text-gray-200">

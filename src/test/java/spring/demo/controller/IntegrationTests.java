@@ -3,6 +3,7 @@ package spring.demo.controller;
 import jakarta.transaction.Transactional;
 import org.apache.catalina.Store;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -50,7 +51,6 @@ public class IntegrationTests {
 
     @Test
     @WithMockUser(username = "test@example.com")
-
     void dataAndCodeShouldBeReturned() throws Exception {
         mockMvc.perform(get("/api/meal").param("name", "Asado"))
                 .andExpect(status().isOk())
@@ -198,12 +198,9 @@ public class IntegrationTests {
 
 
     @Test
-    @WithMockUser(username = "test@example.com") //test acc
+    @WithMockUser(username = "test1@example.com") //test acc
     @Transactional
     void shouldReturnAllMeal404() throws Exception {
-
-        Optional<User> user = userRepository.findByEmail("test@example.com");
-
         mockMvc.perform(get("/api/meals/allMeals"))
                 .andExpect(status().isNotFound());
     }
@@ -221,10 +218,6 @@ public class IntegrationTests {
     @WithMockUser(username = "test1@example.com")
     void shouldReturnEmptyList() throws Exception {
 
-        User user = new User();
-        user.setEmail("test1@example.com");
-
-        userRepository.save(user);
         mockMvc.perform(get("/api/meals/groceryList"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())

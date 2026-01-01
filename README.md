@@ -1,5 +1,4 @@
-# **Plated**
-A full-stack application aimed to help you save food, tighten your budget, and plan interesting, tasteful meals from around the world! 🌎✨
+# <img src="src/frontend/public/favicon-v1.png" alt="Plated Icon" width="27" height="27"> Plated
 
 ![Build Status](https://github.com/bmar1/Pantry-Assist/workflows/Deploy%20to%20EC2/badge.svg)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-green)
@@ -11,8 +10,21 @@ A full-stack application aimed to help you save food, tighten your budget, and p
 ---
 
 ## Demo Photos
-![Menu](./src/frontend/public/menu.png)
-![Cooking steps](./src/frontend/public/cooking.png)
+<table>
+  <tr>
+    <th>Menu</th>
+    <th>Cooking Steps</th>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="./src/frontend/public/menu.png" width="500" height="500" />
+    </td>
+    <td align="center">
+      <img src="./src/frontend/public/cooking.png" width="400" height="400" />
+    </td>
+  </tr>
+</table>
+
 
 
 ##  Objective
@@ -22,7 +34,7 @@ This project, 'plated' aims to serve those who are on a budget or want help trac
 
 ## Getting started
 
-Currently, pantry assist is only hosted with the frontend, if you'd like to run this code locally, you need:
+Currently, plated is only hosted with EC2, full stack, however if you'd run it yourself you need:
 - AWS RDS, EC2 instances
 - Pg Admin
 - API keys relevant (Walmart, with public/private keys, MealDB, Nutrionix which is now deprecated)
@@ -40,10 +52,13 @@ npm start
 This application, based on your requirements and use cases, adapts to help you find interesting meals while providing grocery prices in your local area via Walmart’s data.
 
 ###  Meal Planning
-Need help tracking how many calories you eat or what exactly you’re eating? Say no more! Pantry Assist easily tracks your weekly meals in a clean, organized format.
+Need help tracking how many calories you eat or what exactly you’re eating? Say no more! Plated easily tracks your weekly meals in a clean, organized format, to make sure you never overeat.
 
-###  Secure Login
-Pantry Assist boasts secure, role-based access control throughout the app, enforcing security through JWT tokens.
+###  Security
+Plated  boasts secure, role-based access control throughout the app, enforcing security through JWT tokens.
+
+### Analytics
+Know how much you save compared to the average Canadian, at any time
 
 ### Ease of use
 We offer an easy UI to navigate through to help you day-by-day to cook, and plan your meals!
