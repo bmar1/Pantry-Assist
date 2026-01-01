@@ -30,7 +30,11 @@ jobs:
 
       - name: Run Maven tests
         env:
+          SPRING_DATASOURCE_URL: ${{ secrets.CONNECTIONKEY }}
+          SPRING_DATASOURCE_USERNAME: ${{ secrets.DBNAME }}
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.DBPASSWORD }}
           JWT_KEY: ${{ secrets.jwt_key }}  #add key when running springboot
+          
         run: mvn -B clean test          
 
   deploy:
