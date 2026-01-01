@@ -28,13 +28,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-m2-
 
-      - name: Make mvnw executable
-        run: chmod +x mvnw
-
       - name: Run Maven tests
         env:
           JWT_KEY: ${{ secrets.jwt_key }}  #add key when running springboot
-        run: ./mvnw -B clean test          
+        run: mvn -B clean test          
 
   deploy:
     name: Deploy to EC2
