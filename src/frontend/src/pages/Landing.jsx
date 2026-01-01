@@ -164,8 +164,8 @@ export default function Landing() {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="text-2xl md:text-3xl lg:text-4xl mb-12 max-w-4xl text-[#fffefa] font-light"
             >
-              Pantry Assist is your meal planner and budget maintainer all in one — letting you
-              focus on growing instead of tracking.
+              Plated is your meal planner and budget maintainer all in one — letting you focus on
+              growing instead of tracking.
             </motion.p>
 
             <motion.button
