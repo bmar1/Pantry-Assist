@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,6 +29,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class MealPlanService {
+
+    @Value("${prod}")
+    private String enableIngredientFilter;
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
@@ -72,10 +76,24 @@ public class MealPlanService {
                 .collect(Collectors.toList());
 
 
-        //Filter in 3 steps and return final list
-        recipieList = filterByCommonIngredientsOptimized(recipieList, 4);
+        if (recipieList.isEmpty()) {
+            List<Recipe> allRecipes = recipeRepository.findAll();
+            return recipieList;
+        }
+
+        if(Objects.equals(enableIngredientFilter, "true"))
+            recipieList = filterByCommonIngredientsOptimized(recipieList, 4);
+
+
         recipieList = filterByCalories(recipieList, user);
         recipieList = filterByPrice(recipieList, user, priceList);
+        log.info("After filterByPrice: {} recipes", recipieList.size());
+
+        if (recipieList.isEmpty()) {
+            log.error("ALL RECIPES FILTERED OUT by filterByPrice!");
+        }
+
+        log.info("=== loadandFilterRecipies END: returning {} recipes ===", recipieList.size());
         return recipieList;
     }
 

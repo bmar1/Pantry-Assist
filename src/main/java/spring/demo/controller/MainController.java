@@ -74,11 +74,16 @@ public class MainController {
     // Handles the inital onboarding of saving userPreferences, loading and sorting meals, providing them back to the user and saving all data
     @PostMapping("/onboarding")
     @Transactional
-    public ResponseEntity<ArrayList> onboarding(@RequestBody UserPreference pref, @AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
+    public ResponseEntity<ArrayList> onboarding(@RequestBody UserPreference pref,
+                                                @AuthenticationPrincipal UserDetails userDetails)
+            throws JsonProcessingException {
         String email = userDetails.getUsername();
+
         if (email == null) {
-            log.warn("User details or email is null!");
+            log.error("User details or email is null!");
+            return ResponseEntity.status(500).build();
         }
+
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -86,21 +91,23 @@ public class MainController {
             return ResponseEntity.badRequest().build();
         }
 
-        // Update preferences if OK
         user.setPreferences(pref);
 
-        //Return filtered list after onboarding
+
+        // Return filtered list after onboarding
         try {
             recipieList = mealPlanService.loadandFilterRecipies(user, recipieList, priceList);
         } catch (Exception e) {
+            log.error("ERROR in loadandFilterRecipies", e);
             e.printStackTrace();
             return ResponseEntity.status(500).build();
         }
-        //Save new ingredients
+
+        // Save new ingredients
         if(!priceList.isEmpty()) {
+            log.info("Saving {} ingredients", priceList.size());
             for (Ingredient ingredient : priceList) {
                 ingredientRepository.save(ingredient);
-
             }
         }
 
@@ -108,18 +115,23 @@ public class MainController {
         user.getMealPlans().clear();
 
         int MAX_MEAL_PLAN_SIZE = (user.getPreferences().getMeals() * 7);
+
+
         if(recipieList.size() > MAX_MEAL_PLAN_SIZE){
-            //filter existing recipes further, to save ingredients, saving cost
             recipieList = mealPlanService.filterRecipes(recipieList, MAX_MEAL_PLAN_SIZE,
                     user.getPreferences().getCalories(), user.getPreferences().getMeals());
         }
 
         mealPlanService.findAndSaveMealPlan(user, recipieList, priceList);
+
         userRepository.save(user);
+
         if(recipieList.isEmpty() || recipieList.size() < 13){
             return ResponseEntity.status(500).build();
         }
-        else return ResponseEntity.ok(recipieList);
+
+        log.info("=== ONBOARDING SUCCESS: Returning {} recipes ===", recipieList.size());
+        return ResponseEntity.ok(recipieList);
     }
 
     //Returns all dashboard data

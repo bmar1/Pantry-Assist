@@ -29,9 +29,6 @@ jobs:
             ${{ runner.os }}-m2-
 
       - name: Run Maven tests
-        env:
-          JWT_KEY: ${{ secrets.jwt_key }}  #add key when running springboot
-          
         run: mvn -B clean test          
 
   deploy:
