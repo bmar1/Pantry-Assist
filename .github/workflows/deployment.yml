@@ -28,6 +28,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-m2-
 
+
       - name: Run Maven tests
         run: mvn -B clean test          
 
