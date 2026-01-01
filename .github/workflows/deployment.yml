@@ -33,7 +33,7 @@ jobs:
 
       - name: Run Maven tests
         env:
-          JWT_KEY: ${{ secrets.jwt_key }}  
+          JWT_KEY: ${{ secrets.jwt_key }}  #add key when running springboot
         run: ./mvnw -B clean test          
 
   deploy:
