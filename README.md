@@ -1,6 +1,7 @@
 # <img src="src/frontend/public/favicon-v1.png" alt="Plated Icon" width="27" height="27"> Plated
 
-=======
+
+
 A full-stack application aimed to help you save food, tighten your budget, and plan interesting, tasteful meals from around the world! 🌎✨
 
 
