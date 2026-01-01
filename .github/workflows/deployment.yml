@@ -28,10 +28,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-m2-
 
-      - name: Run Maven tests
-        env:
-          JWT_KEY: ${{ secrets.jwt_key }}  #add key when running springboot
-          
+      - name: Run Maven tests          
         run: mvn -B clean test          
 
   deploy:
