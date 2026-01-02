@@ -32,7 +32,7 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
     setShowLoading(true);
 
     try {
-      const res = await fetch('http://localhost:8080/api/onboarding', {
+      const res = await fetch('/api/onboarding', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -264,8 +264,7 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
                     <h2 className="text-2xl font-bold mb-2 text-white">Dietary Preferences 🥗</h2>
                     <p className="text-white/70 text-sm mb-4">Help us filter recipes for you</p>
 
-                    <div className="space-y-3 mb-4">
-                    </div>
+                    <div className="space-y-3 mb-4"></div>
 
                     <div>
                       <label className="text-white text-sm font-semibold mb-2 block">
