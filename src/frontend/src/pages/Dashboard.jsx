@@ -18,9 +18,7 @@ import LoadingScreen from './LoadingScreen';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [showOnboarding, setShowOnboarding] = useState(
-    () => localStorage.getItem('onboarding') === 'true'
-  );
+  const [showOnboarding, setShowOnboarding] = useState(false);
   //states
   const [isNavVisible, setIsNavVisible] = useState(false);
   const previousMealIdsRef = useRef(null);
@@ -33,10 +31,15 @@ export default function Dashboard() {
   const [isGroceryLoading, setIsGroceryLoading] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
+  //nav
+  const [eaten, setEaten] = useState(0);
+  const [target, setTarget] = useState(0);
+  const [remaining, setRemaining] = useState(0);
   const [progress, setProgress] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [shouldNavigate, setShouldNavigate] = useState(false);
   const [budget, setBudget] = useState(0);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/');
@@ -56,13 +59,33 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    // Load the previous meal names from localStorage on mount
+    const onboardingStatus = localStorage.getItem('onboarding');
+    if (onboardingStatus === 'true') {
+      setShowOnboarding(true);
+      setIsInitialLoad(false);
+    } else {
+      setShowOnboarding(false);
+      // Load data on initial mount if onboarding is complete
+      if (isInitialLoad) {
+        loadDashboardData();
+        setIsInitialLoad(false);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    // Only load if:
+    // 1. Not showing onboarding
+    // 2. Not showing loading screen
+    // 3. Data is empty (hasn't been loaded yet)
     const stored = localStorage.getItem('previousMealNames');
     if (stored) {
       previousMealIdsRef.current = stored;
     }
-    loadDashboardData();
-  }, []);
+    if (!showOnboarding && !isLoading && grocery.length === 0 && meals.length === 0) {
+      loadDashboardData();
+    }
+  }, [showOnboarding, isLoading]);
 
   //navigate to the grocery page when needed
   useEffect(() => {
@@ -77,7 +100,7 @@ export default function Dashboard() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`api/load`, {
+      const response = await fetch(`/api/load`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -109,6 +132,10 @@ export default function Dashboard() {
       localStorage.setItem('previousMealNames', currentMealNames);
 
       setMeals(data.selectedMeals);
+      setRemaining(data.remaining);
+      setBudget(data.budget);
+      setTarget(data.target);
+      setEaten(data.eaten);
       setProgress(data.progress);
       setBudget(data.budget);
       setMealPreview(data.randomMeals);
@@ -191,9 +218,12 @@ export default function Dashboard() {
         setShowSettings={setShowSettings}
         handleLogout={handleLogout}
         progress={progress}
+        caloriesEaten={eaten}
+        caloriesTarget={target}
+        caloriesRemaining={remaining}
       />
 
-      <main className={`p-8 transition-all duration-300 ${isNavVisible ? 'ml-60' : 'ml-52'}`}>
+      <main className={`p-8 transition-all duration-300 ${isNavVisible ? 'ml-60' : 'ml-20'}`}>
         {showNewMealPlan && (
           <NewMealPlanShowcase meals={meals} onClose={() => setShowNewMealPlan(false)} />
         )}
@@ -207,7 +237,7 @@ export default function Dashboard() {
 
         <div className={`flex flex-col lg:flex-row gap-8 mt-5 max-w-7xl mx-auto`}>
           {/* Main Suggestion Card */}
-          <div className="mr-24 relative overflow-hidden bg-white border border-gray-100 p-10 rounded-[2.5rem] shadow-sm hover:shadow-xl transition-all duration-500 h-[650px] flex flex-col w-full lg:w-2/3">
+          <div className="relative overflow-hidden bg-white border border-gray-100 p-10 rounded-[2.5rem] shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col w-full lg:w-2/3">
             {meals.length > 0 && (
               <>
                 <div className="mb-8 ml">
@@ -272,11 +302,11 @@ export default function Dashboard() {
           <div className="flex flex-col gap-6 w-full lg:w-[380px]">
             <div
               onClick={handleGroceryClick}
-              className="group p-8 rounded-[2rem] bg-[#e3f4f5] border border-white/50 shadow-sm hover:shadow-md transition-all cursor-pointer relative overflow-hidden"
+              className="group p-8 rounded-[2rem] bg-[#f7f2e1] border border-gray-200 shadow-sm hover:shadow-md transition-all cursor-pointer relative overflow-hidden"
             >
               <div className="flex justify-between items-center mb-6">
-                <h2 className="font-bold text-xl text-[#213a3b]">Grocery List</h2>
-                <span className="text-xs font-bold text-[#4a7a7c] bg-white/50 px-2 py-1 rounded-md">
+                <h2 className="font-bold text-xl text-[#68551c]">Grocery List</h2>
+                <span className="text-xs font-bold text-[#b0a384] bg-gray-200 px-2 py-1 rounded-md">
                   {grocery.length} items
                 </span>
               </div>
@@ -290,18 +320,20 @@ export default function Dashboard() {
                   {groceryPreview.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center justify-between bg-white/40 p-2 rounded-xl border border-white/20"
+                      className="flex items-center justify-between bg-white p-2 rounded-xl border border-gray-100"
                     >
                       <div className="flex items-center">
                         <img
                           src={item.imageUrl || '/icons/groceryIcon.png'}
                           className="w-10 h-10 rounded-lg object-cover"
                         />
-                        <span className="ml-3 text-sm font-semibold text-[#213a3b]">
+                        <span className="ml-3 text-sm font-semibold text-[#68551c]">
                           {item.name}
                         </span>
                       </div>
-                      <span className="text-sm font-bold pr-2">${item.totalPrice.toFixed(2)}</span>
+                      <span className="text-sm font-bold pr-2 text-[#b0a384]">
+                        ${item.totalPrice.toFixed(2)}
+                      </span>
                     </div>
                   ))}
                 </div>

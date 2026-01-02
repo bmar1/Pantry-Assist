@@ -36,6 +36,21 @@ export default function Settings({ setShowSettings, setShowPreferences }) {
     }
   };
 
+  const handleNewMealPlan = async () => {
+    try {
+      const res = await fetch('http://localhost:8080/api/onboarding', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(localStorage.getItem('pref'))
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const handleEditPreferences = () => {
     setShowSettings(false);
     setShowPreferences(true);
@@ -75,6 +90,12 @@ export default function Settings({ setShowSettings, setShowPreferences }) {
             className="w-full bg-[#5A7A4D] hover:bg-[#446437] text-white font-medium py-3 rounded-lg transition-colors"
           >
             Change Password
+          </button>
+          <button
+            onClick={handleNewMealPlan}
+            className="w-full bg-[#5A7A4D] hover:bg-[#446437] mt-5 text-white font-medium py-3 rounded-lg transition-colors"
+          >
+            Create New Meal Plan
           </button>
         </div>
 

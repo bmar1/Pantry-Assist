@@ -24,7 +24,7 @@ const RecipePage = () => {
     try {
       const token = localStorage.getItem('token');
 
-      const url = `api/meals/updateMeal?name=${encodeURIComponent(name)}`;
+      const url = `/api/meals/updateMeal?name=${encodeURIComponent(name)}`;
       console.log('Request URL:', url);
 
       const response = await fetch(url, {
@@ -261,10 +261,10 @@ const RecipePage = () => {
                 </h2>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {recipe.calories > 0 && (
-                    <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-5 rounded-2xl border-2 border-orange-200 shadow-md hover:shadow-lg transition-shadow">
-                      <div className="text-orange-600 text-2xl mb-2"></div>
+                    <div className="bg-white p-5 rounded-2xl border-2 border-gray-100 shadow-md hover:shadow-lg transition-shadow">
+                      <div className="text-sky-600 text-2xl mb-2"></div>
                       <p className="text-sm font-medium text-gray-600 mb-1">Calories</p>
-                      <p className="text-3xl font-bold text-orange-700">{recipe.calories}</p>
+                      <p className="text-3xl font-bold text-sky-700">{recipe.calories}</p>
                       <p className="text-xs text-gray-500 mt-1">kcal</p>
                     </div>
                   )}
@@ -276,10 +276,9 @@ const RecipePage = () => {
               {/* Ingredients Section */}
               <div className="lg:col-span-1">
                 <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-3">
-                  <span className="text-3xl"></span>
                   Ingredients
                 </h2>
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200 shadow-lg">
+                <div className="bg-gray-50 rounded-2xl p-6 border-2 border-gray-100 shadow-lg">
                   <ul className="space-y-3">
                     {recipe.ingredients &&
                       Object.entries(recipe.ingredients).map(([ingredient, measure], index) => (
@@ -304,7 +303,6 @@ const RecipePage = () => {
               {/* Instructions Section */}
               <div className="lg:col-span-2">
                 <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-3">
-                  <span className="text-3xl"></span>
                   Cooking Steps
                 </h2>
                 <div className="space-y-4">
@@ -313,7 +311,7 @@ const RecipePage = () => {
                       key={index}
                       className={`group relative rounded-2xl cursor-pointer transition-all duration-300 overflow-hidden ${
                         stepCompleted[index]
-                          ? 'bg-gradient-to-r from-[#6d9851] to-[#5A7A4D] shadow-lg'
+                          ? 'bg-[#628d45] shadow-lg'
                           : 'bg-white border-2 border-gray-200 hover:border-[#6d9851] hover:shadow-md'
                       }`}
                       onClick={() => {
@@ -336,7 +334,7 @@ const RecipePage = () => {
                           className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center mr-4 font-bold text-lg transition-all duration-300 ${
                             stepCompleted[index]
                               ? 'bg-white text-[#6d9851] shadow-lg'
-                              : 'bg-gradient-to-br from-[#6d9851] to-[#5A7A4D] text-white'
+                              : 'bg-[#628d45] text-white'
                           }`}
                         >
                           {stepCompleted[index] ? '✓' : index + 1}
@@ -351,13 +349,6 @@ const RecipePage = () => {
                           </p>
                         </div>
                       </div>
-
-                      {/* Completion indicator */}
-                      {stepCompleted[index] && (
-                        <div className="absolute top-3 right-3 bg-white/30 backdrop-blur-sm px-3 py-1 rounded-full text-white text-xs font-semibold">
-                          Completed
-                        </div>
-                      )}
                     </div>
                   ))}
                 </div>
@@ -371,7 +362,7 @@ const RecipePage = () => {
                       setShowPopup(true);
                       setTimeout(() => setShowPopup(false), 4000);
                     }}
-                    className="mt-6 w-full py-4 bg-gradient-to-r from-[#6d9851] to-[#5A7A4D] text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+                    className="mt-6 w-full py-4 bg-[#628d45] text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
                   >
                     Mark All Steps as Complete
                   </button>
@@ -383,7 +374,6 @@ const RecipePage = () => {
             {embedUrl && (
               <div className="mt-12">
                 <h2 className="text-3xl font-bold mb-6 text-gray-800 flex items-center gap-3">
-                  <span className="text-3xl"></span>
                   Video Tutorial
                 </h2>
                 <div className="rounded-2xl overflow-hidden shadow-2xl border-4 border-gray-100">

@@ -48,14 +48,14 @@ export default function AuthForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#a4d1d4] to-[#628d45] p-4 sm:p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4 sm:p-6">
       <div className="flex flex-col md:flex-row rounded-2xl shadow-xl overflow-hidden max-w-sm md:max-w-4xl w-full">
         {/* Create rounded div with image and text */}
-        <div className="bg-black bg-opacity-20 text-white flex flex-col items-center justify-center p-6 md:p-8 w-full md:w-1/2 text-center">
+        <div className="bg-[#f7f2e1] text-[#1a2e05] flex flex-col items-center justify-center p-6 md:p-8 w-full md:w-1/2 text-center">
           <img
             src="/grocery.png"
             alt="Groceries"
-            className="w-32 h-32 md:w-48 md:h-48 object-contain mb-4 md:mb-6"
+            className="w-64 h-64 md:w-40 md:h-40 object-cover mb-4 md:mb-6"
           />
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 md:mb-3">
             Welcome to Plated

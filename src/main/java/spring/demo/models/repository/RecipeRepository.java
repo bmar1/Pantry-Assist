@@ -46,4 +46,10 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     List<Recipe> findRecipesWithNullOrZeroMealCost();
 
 
+    @Query(value = "SELECT SUM(r.calories) FROM user_meal_plans ump " +
+            "JOIN recipes r ON r.id = ump.recipe_id " +
+            "WHERE ump.user_id = :userId " +
+            "AND ump.eaten = true " +
+            "AND ump.eaten_date = CURRENT_DATE", nativeQuery = true)
+    Integer getTodayEatenCalories(@Param("userId") Long userId);
 }

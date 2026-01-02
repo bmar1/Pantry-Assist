@@ -1,7 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import './About.css';
+
+import Footer from '../components/Footer';
 
 const About = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -22,7 +23,7 @@ const About = () => {
             <h2 className="text-white text-lg sm:text-xl font-semibold">Plated</h2>
           </div>
           <button
-            onClick={() => handleNavigation('/landing')}
+            onClick={() => handleNavigation('/')}
             className="bg-[#ffffff] text-[#5A7A4D] hover:bg-[#cedfc2] px-6 py-2 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md hidden md:block"
           >
             Home
@@ -35,13 +36,13 @@ const About = () => {
           <div className="hidden md:flex items-center gap-6">
             <button
               onClick={() => handleNavigation('/Login')}
-              className="bg-[#8abeeb] text-[#2c51b8] hover:bg-[#90c6f6] px-6 py-2 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
+              className="bg-white/20 hover:bg-white/30 text-white px-6 py-2 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
             >
               Login
             </button>
             <button
               onClick={() => handleNavigation('/Login')}
-              className="bg-[#ffffff] text-[#5A7A4D] hover:bg-[#cedfc2] px-6 py-2 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
+              className="bg-[#819c57] text-white hover:bg-[#94b264] px-6 py-2 rounded-lg font-medium transition-colors shadow-sm hover:shadow-md"
             >
               Build Plan
             </button>
@@ -76,7 +77,7 @@ const About = () => {
         <div className="md:hidden bg-[#5A7A4D] text-center py-4">
           <button
             onClick={() => {
-              handleNavigation('/landing');
+              handleNavigation('/');
               setIsMenuOpen(false);
             }}
             className="block w-full py-2 text-white hover:bg-[#446437]"
@@ -166,7 +167,7 @@ const About = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ duration: 0.5, delay: i * 0.2 }}
-              className="p-6 rounded-2xl bg-white/600 backdrop-blur-xl border border-white/40  shadow-lg text-center"
+              className="p-6 rounded-2xl bg-white shadow-lg text-center"
             >
               <h3 className="text-2xl font-semibold mb-2 text-[#5A7A4D]">{card.title}</h3>
               <p className="text-base text-gray-600">{card.desc}</p>
@@ -191,81 +192,7 @@ const About = () => {
         </motion.section>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-[#5A7A4D] text-white py-8 mt-auto">
-        <div className="max-w-6xl mx-auto px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-6">
-            <div>
-              <div className="flex items-center gap-3 mb-4">
-                <img src="/favicon-v1.png" className="w-10 h-10" alt="Logo" />
-                <h3 className="text-xl font-semibold">Plated</h3>
-              </div>
-              <p className="text-sm text-gray-200">
-                Plan meals, track calories, and save money effortlessly.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Product</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <a href="#" className="text-gray-200 hover:text-white">
-                    Features
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-200 hover:text-white">
-                    Recipes
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Company</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <a href="/About" className="text-gray-200 hover:text-white">
-                    About Us
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-200 hover:text-white">
-                    Contact
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-3">Legal</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <a href="#" className="text-gray-200 hover:text-white">
-                    Privacy Policy
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-200 hover:text-white">
-                    Terms of Service
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-400 pt-6 flex justify-between items-center text-sm text-gray-200">
-            <p>© 2026 Plated. All rights reserved.</p>
-            <div className="flex gap-4">
-              <a href="#" className="hover:text-white">
-                Twitter
-              </a>
-              <a href="#" className="hover:text-white">
-                Facebook
-              </a>
-              <a href="#" className="hover:text-white">
-                Instagram
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

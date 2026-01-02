@@ -4,6 +4,7 @@ This class does the main logic of the applications pages and data, handling onbo
 
 package spring.demo.controller;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -134,23 +135,98 @@ public class MainController {
         return ResponseEntity.ok(recipieList);
     }
 
-    //Returns all dashboard data
-    @GetMapping("/load")
-    public ResponseEntity<?> loadDashboard(@AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
-        List<Recipe> selectedMeals = mealPlanService.selectMeals(userDetails, recipieList);
-        List<Recipe> randomMeals = mealPlanService.random();
-        List<Ingredient> groceryList = groceryList(userDetails);
-        User user = userRepository.findByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        Integer progress = mealPlanService.getProgress(user);
-        Integer budget = (int) user.getPreferences().getBudget();
+    @PostMapping("/meals/newPlan")
+    @Transactional
+    public ResponseEntity<ArrayList> newMealPlan(
+                                                @AuthenticationPrincipal UserDetails userDetails)
+            throws JsonProcessingException {
+        String email = userDetails.getUsername();
 
-        //check data
-        if(selectedMeals.isEmpty() || randomMeals.isEmpty() || groceryList.isEmpty() || budget == 0){
+        if (email == null) {
+            log.error("User details or email is null!");
             return ResponseEntity.status(500).build();
         }
 
-        DashboardData data = new DashboardData(selectedMeals, randomMeals, groceryList, progress, budget);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if(user.getPreferences().getMeals() == 0 || user.getPreferences().getBudget() == 0 || user.getPreferences().getCalories() == 0){
+            return ResponseEntity.badRequest().build();
+        }
+
+
+        // Return filtered list after onboarding
+        try {
+            recipieList = mealPlanService.loadandFilterRecipies(user, recipieList, priceList);
+        } catch (Exception e) {
+            log.error("ERROR in loadandFilterRecipies", e);
+            e.printStackTrace();
+            return ResponseEntity.status(500).build();
+        }
+
+        // Save new ingredients
+        if(!priceList.isEmpty()) {
+            log.info("Saving {} ingredients", priceList.size());
+            for (Ingredient ingredient : priceList) {
+                ingredientRepository.save(ingredient);
+            }
+        }
+
+        user.getGroceryList().clear();
+        user.getMealPlans().clear();
+
+        int MAX_MEAL_PLAN_SIZE = (user.getPreferences().getMeals() * 7);
+
+
+        if(recipieList.size() > MAX_MEAL_PLAN_SIZE){
+            recipieList = mealPlanService.filterRecipes(recipieList, MAX_MEAL_PLAN_SIZE,
+                    user.getPreferences().getCalories(), user.getPreferences().getMeals());
+        }
+
+        mealPlanService.findAndSaveMealPlan(user, recipieList, priceList);
+
+        userRepository.save(user);
+
+        if(recipieList.isEmpty() || recipieList.size() < 13){
+            return ResponseEntity.status(500).build();
+        }
+
+        log.info("=== ONBOARDING SUCCESS: Returning {} recipes ===", recipieList.size());
+        return ResponseEntity.ok(recipieList);
+    }
+
+    @GetMapping("/load")
+    public ResponseEntity<?> loadDashboard(@AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
+        // Get user
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        // Load all data
+        List<Recipe> selectedMeals = mealPlanService.selectMeals(userDetails, recipieList);
+        List<Recipe> randomMeals = mealPlanService.random();
+        List<Ingredient> groceryList = groceryList(userDetails);
+
+        Integer budget = (int) user.getPreferences().getBudget();
+
+        // Calculate calorie stats (merged from getCalorieStats endpoint)
+        int targetCalories = user.getPreferences().getCalories();
+        Integer eatenToday = recipeRepository.getTodayEatenCalories(user.getId());
+        if (eatenToday == null) eatenToday = 0;
+
+        int remaining = Math.max(targetCalories - eatenToday, 0);
+
+        if (selectedMeals.isEmpty() || randomMeals.isEmpty() || groceryList.isEmpty() || budget == 0) {
+            return ResponseEntity.status(500).build();
+        }
+
+        Integer progress = targetCalories > 0
+                ? Math.min((eatenToday * 100) / targetCalories, 100)
+                : 0;
+
+        DashboardData data = new DashboardData(selectedMeals, randomMeals, groceryList, progress,
+                budget, eatenToday, targetCalories, remaining
+        );
+
         return ResponseEntity.ok(data);
     }
 
@@ -204,6 +280,7 @@ public class MainController {
         if (mealPlanToMark.isPresent()) {
             UserMealPlan mealPlan = mealPlanToMark.get();
             mealPlan.setEaten(true);
+            mealPlan.setEatenDate(LocalDate.now());
 
             log.info("Marking planned meal as eaten: {}", mealPlan.getRecipe().getName());
             log.info("MealPlan ID: {}, Planned: {}, Eaten: {}",

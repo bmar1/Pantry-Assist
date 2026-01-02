@@ -18,7 +18,6 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
     calories: 2000,
     budget: 50,
     meals: 2,
-    vegan: false,
     allergies: '',
     update: false
   });
@@ -33,7 +32,7 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
     setShowLoading(true);
 
     try {
-      const res = await fetch('api/onboarding', {
+      const res = await fetch('http://localhost:8080/api/onboarding', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,22 +41,25 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
         body: JSON.stringify(formData)
       });
 
-      setTimeout(() => {
-        setShowLoading(false);
-      }, 5500);
-
+      localStorage.setItem('pref', JSON.stringify(formData));
       localStorage.removeItem('onboarding');
+
       if (res.ok) {
         const data = await res.json();
-
         console.table(data);
-        alert('Onboarding data submitted successfully!');
+
+        // Wait for loading animation, then trigger data load
+        setTimeout(() => {
+          setShowLoading(false);
+          // Data will load automatically via useEffect when showLoading becomes false
+        }, 5500);
       } else {
         setShowLoading(false);
         alert('Failed to submit onboarding data');
       }
     } catch (err) {
       console.error(err);
+      setShowLoading(false);
       alert('Error submitting onboarding data');
     }
   };
@@ -162,9 +164,6 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
                         value={formData.calories}
                         onChange={(e) => setFormData({ ...formData, calories: e.target.value })}
                         className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider"
-                        style={{
-                          background: `linear-gradient(to right, white 0%, white ${((formData.calories - 1400) / (3000 - 1400)) * 100}%, rgba(255,255,255,0.2) ${((formData.calories - 1400) / (3000 - 1400)) * 100}%, rgba(255,255,255,0.2) 100%)`
-                        }}
                       />
                       <div className="flex justify-between text-xs text-white/60 mt-1">
                         <span>1400</span>
@@ -215,9 +214,6 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
                       value={formData.budget}
                       onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
                       className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer"
-                      style={{
-                        background: `linear-gradient(to right, white 0%, white ${((formData.budget - 20) / (150 - 20)) * 100}%, rgba(255,255,255,0.2) ${((formData.budget - 20) / (150 - 20)) * 100}%, rgba(255,255,255,0.2) 100%)`
-                      }}
                     />
                     <div className="flex justify-between text-xs text-white/60 mt-1">
                       <span>$20</span>
@@ -269,18 +265,6 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
                     <p className="text-white/70 text-sm mb-4">Help us filter recipes for you</p>
 
                     <div className="space-y-3 mb-4">
-                      <label className="flex items-center p-4 bg-white/10 rounded-lg cursor-pointer hover:bg-white/20 transition-all">
-                        <input
-                          type="checkbox"
-                          checked={formData.vegan}
-                          onChange={(e) => setFormData({ ...formData, vegan: e.target.checked })}
-                          className="w-5 h-5 rounded text-green-600 mr-3"
-                        />
-                        <div>
-                          <span className="text-white font-semibold"> Vegan</span>
-                          <p className="text-white/60 text-xs">Plant-based only</p>
-                        </div>
-                      </label>
                     </div>
 
                     <div>

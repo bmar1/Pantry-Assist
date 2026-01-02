@@ -30,7 +30,7 @@ export default function AllMeals() {
 
   const loadMeals = async () => {
     try {
-      const response = await fetch(`api/meals/allMeals`, {
+      const response = await fetch(`/api/meals/allMeals`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ export default function AllMeals() {
               className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-[#628d45] transform hover:-translate-y-2"
               onClick={() => handleRecipeClick(meal.name)}
             >
-              <div className="relative h-52 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+              <div className="relative h-52 overflow-hidden bg-gray-100">
                 <img
                   src={meal.thumbnail}
                   alt={meal.name}
@@ -101,29 +101,7 @@ export default function AllMeals() {
                   {meal.name}
                 </h2>
 
-                <div className="flex items-center justify-between text-sm text-gray-600">
-                  <div className="flex items-center gap-1.5">
-                    <svg
-                      className="w-4 h-4 text-[#628d45]"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 10V3L4 14h7v7l9-11h-7z"
-                      />
-                    </svg>
-                    <span className="font-semibold">{meal.calories} cal</span>
-                  </div>
-
-                  {/* trigger on hover*/}
-                  <div className="flex items-center text-[#628d45] font-semibold text-sm opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all">
-                    View Recipe
-                  </div>
-                </div>
+                <div className="flex items-center justify-between text-sm text-gray-600"></div>
               </div>
             </div>
           ))}

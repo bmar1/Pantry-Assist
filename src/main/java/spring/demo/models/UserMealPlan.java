@@ -3,6 +3,8 @@ package spring.demo.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+
 
 @Entity
 @Table(
@@ -37,12 +39,23 @@ public class UserMealPlan {
     @JoinColumn(name = "recipe_id", nullable = false)
     private Recipe recipe;
 
+    @Column(name = "eaten_date")
+    private LocalDate eatenDate;
+
     public UserMealPlan() {
     }
 
     public UserMealPlan(User user, Recipe recipe) {
         this.user = user;
         this.recipe = recipe;
+    }
+
+    public LocalDate getEatenDate() {
+        return eatenDate;
+    }
+
+    public void setEatenDate(LocalDate eatenDate) {
+        this.eatenDate = eatenDate;
     }
 
     // Getters and Setters
