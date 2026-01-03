@@ -4,9 +4,9 @@ This class covers authorization and authentication of a user, as well as basic c
 
 package spring.demo.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,38 +30,63 @@ public class AuthController {
 	private final AuthenticationManager authenticationManager;
 	private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-	@PostMapping("/signup")
-	public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
-		// create and save new user
-		User user = new User();
-		user.setEmail(request.getEmail());
-		user.setPassword(passwordEncoder.encode(request.getPassword())); //encrypt password
-		user.setRole(Role.USER); 
-		
-		//Check if user is present already (if so bad request)
-		if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-		    return ResponseEntity.badRequest().body(new AuthResponse("Email already exists"));
-		}
+    @PostMapping("/signup")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        try {
+            // Check if user already exists FIRST
+            if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(new AuthResponse("Email already exists"));
+            }
 
-		userRepository.save(user);
-		String token = jwtService.generateToken(user);
-		return ResponseEntity.ok(new AuthResponse(token));
-	}
+            // Create and save new user
+            User user = new User();
+            user.setEmail(request.getEmail());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setRole(Role.USER);
 
-	@PostMapping("/login")
-	public ResponseEntity<AuthResponse> login(@RequestBody AuthenticationRequest request) {
+            userRepository.save(user);
+            String token = jwtService.generateToken(user);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(new AuthResponse(token));
 
-		// authenticate user credentials
-		authenticationManager
-				.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new AuthResponse("Registration failed. Please try again."));
+        }
+    }
 
-		User user = userRepository.findByEmail(request.getEmail())
-				.orElseThrow(() -> new UsernameNotFoundException("User not found!"));
-	
-		String token = jwtService.generateToken(user);
-		return ResponseEntity.ok(new AuthResponse(token));
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody AuthenticationRequest request) {
+        try {
+            // authenticate user credentials
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
 
-	}
+            User user = userRepository.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found!"));
+
+            String token = jwtService.generateToken(user);
+            return ResponseEntity.ok(new AuthResponse(token));
+
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AuthResponse("Invalid email or password"));
+
+        } catch (DisabledException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AuthResponse("Account is disabled"));
+
+        } catch (LockedException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AuthResponse("Account is locked"));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new AuthResponse("Login failed. Please try again."));
+        }
+    }
 
 	//Refreshes a USER's jwt token
 	@GetMapping("/refresh")
