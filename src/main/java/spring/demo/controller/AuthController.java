@@ -24,11 +24,10 @@ import spring.demo.models.repository.UserRepository;
 @RequiredArgsConstructor
 public class AuthController {
 
-	
-	private final UserRepository userRepository;
-	private final JwtService jwtService;
-	private final AuthenticationManager authenticationManager;
-	private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final UserRepository userRepository;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/signup")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
@@ -36,7 +35,7 @@ public class AuthController {
             // Check if user already exists FIRST
             if (userRepository.findByEmail(request.getEmail()).isPresent()) {
                 return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body(new AuthResponse("Email already exists"));
+                        .body(new AuthResponse(null,"Email already exists"));
             }
 
             // Create and save new user
@@ -48,11 +47,11 @@ public class AuthController {
             userRepository.save(user);
             String token = jwtService.generateToken(user);
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new AuthResponse(token));
+                    .body(new AuthResponse(token, "Success!"));
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new AuthResponse("Registration failed. Please try again."));
+                    .body(new AuthResponse(null,"Registration failed. Please try again."));
         }
     }
 
@@ -68,23 +67,23 @@ public class AuthController {
                     .orElseThrow(() -> new UsernameNotFoundException("User not found!"));
 
             String token = jwtService.generateToken(user);
-            return ResponseEntity.ok(new AuthResponse(token));
+            return ResponseEntity.ok(new AuthResponse(token, "Success!"));
 
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new AuthResponse("Invalid email or password"));
+                    .body(new AuthResponse(null,"Invalid email or password"));
 
         } catch (DisabledException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new AuthResponse("Account is disabled"));
+                    .body(new AuthResponse(null,"Account is disabled"));
 
         } catch (LockedException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new AuthResponse("Account is locked"));
+                    .body(new AuthResponse(null,"Account is locked"));
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new AuthResponse("Login failed. Please try again."));
+                    .body(new AuthResponse(null,"Login failed. Please try again."));
         }
     }
 
@@ -96,7 +95,7 @@ public class AuthController {
 				.orElseThrow(() -> new UsernameNotFoundException("User not found!"));
 
 		String token = jwtService.generateToken(user);
-		return ResponseEntity.ok(new AuthResponse(token));
+		return ResponseEntity.ok(new AuthResponse(token, "Successfully created"));
 
 	}
 
