@@ -48,10 +48,8 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
         const data = await res.json();
         console.table(data);
 
-        // Wait for loading animation, then trigger data load
         setTimeout(() => {
           setShowLoading(false);
-          // Data will load automatically via useEffect when showLoading becomes false
         }, 5500);
       } else {
         setShowLoading(false);
@@ -113,24 +111,25 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
                   This will only take a minute and helps us recommend recipes you'll love!
                 </p>{' '}
               </div>
-              <button
+              <motion.button
                 onClick={handleNext}
                 className="px-8 py-3 rounded-lg bg-[#A8C995] text-slate-800 font-bold hover:bg-[#94BF7F] hover:scale-105 transition-all shadow-lg"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 Get Started →
-              </button>
+              </motion.button>
             </motion.div>
           ) : (
             <motion.div
               key={`step-${step}`}
-              initial={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.4 }}
+              exit={{ opacity: 0, x: -50 }}
+              transition={{ duration: 0.4, ease: 'easeInOut' }}
               className="w-full"
             >
               <div className="bg-white rounded-xl p-6">
-                {/* Progress bar with label */}
                 <div className="mb-6">
                   <div className="flex justify-between items-center mb-2">
                     <p className="text-sm text-slate-600">
@@ -143,28 +142,26 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
                   <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
                     <motion.div
                       className="h-full bg-[#A8C995] rounded-full"
-                      initial={{ width: `${((step - 1) / totalSteps) * 100}%` }}
+                      initial={{ width: '0%' }}
                       animate={{ width: `${(step / totalSteps) * 100}%` }}
-                      transition={{ duration: 0.5, ease: 'easeOut' }}
+                      transition={{ duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
                     />
                   </div>
                 </div>
 
                 {step === 1 && (
-                  <div>
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <h2 className="text-2xl font-bold mb-2 text-slate-800">Daily Calorie Target</h2>
                     <p className="text-slate-600 text-sm mb-4">
                       We'll recommend recipes that fit your goals
                     </p>
-
-                    {/* Quick presets */}
                     <div className="grid grid-cols-3 gap-2 mb-4">
                       {[
-                        { label: ' Cut', value: 1500 },
-                        { label: ' Maintain', value: 2000 },
-                        { label: ' Bulk', value: 2500 }
+                        { label: 'Cut', value: 1500 },
+                        { label: 'Maintain', value: 2000 },
+                        { label: 'Bulk', value: 2500 }
                       ].map((preset) => (
-                        <button
+                        <motion.button
                           key={preset.value}
                           onClick={() => setFormData({ ...formData, calories: preset.value })}
                           className={`p-2 rounded-lg text-xs font-semibold transition-all ${
@@ -172,14 +169,26 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
                               ? 'bg-[#A8C995] text-slate-800'
                               : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
                           }`}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                         >
                           {preset.label}
                           <div className="text-xs opacity-70">{preset.value}</div>
-                        </button>
+                        </motion.button>
                       ))}
                     </div>
-
-                    <div className="relative">
+                    <div className="mt-4 text-center">
+                      <motion.p
+                        key={formData.calories}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-3xl font-bold text-slate-800"
+                      >
+                        {formData.calories}
+                      </motion.p>
+                      <p className="text-slate-600 text-sm">calories per day</p>
+                    </div>
+                     <div className="relative mt-4">
                       <input
                         type="range"
                         min="1400"
@@ -190,34 +199,19 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
                         className="w-full h-2 rounded-lg appearance-none cursor-pointer slider"
                         style={{ background: `linear-gradient(to right, #A8C995 ${caloriePercentage}%, #e2e8f0 ${caloriePercentage}%, #e2e8f0 100%)` }}
                       />
-                      <div className="flex justify-between text-xs text-slate-500 mt-1">
-                        <span>1400</span>
-                        <span>3000</span>
-                      </div>
                     </div>
-
-                    <div className="mt-4 text-center">
-                      <p className="text-3xl font-bold text-slate-800">{formData.calories}</p>
-                      <p className="text-slate-600 text-sm">calories per day</p>
-                    </div>
-
-                    <div className="mt-3 bg-slate-100 rounded-lg p-3 text-xs text-slate-600">
-                      Most adults need 1800-2500 calories/day
-                    </div>
-                  </div>
+                  </motion.div>
                 )}
 
                 {step === 2 && (
-                  <div>
-                    <h2 className="text-2xl font-bold mb-2 text-slate-800">Weekly Budget </h2>
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                    <h2 className="text-2xl font-bold mb-2 text-slate-800">Weekly Budget</h2>
                     <p className="text-slate-600 text-sm mb-4">
                       We'll find recipes that fit your budget
                     </p>
-
-                    {/* Quick presets */}
                     <div className="grid grid-cols-4 gap-2 mb-4">
                       {[20, 40, 60, 80].map((preset) => (
-                        <button
+                        <motion.button
                           key={preset}
                           onClick={() => setFormData({ ...formData, budget: preset })}
                           className={`p-2 rounded-lg text-sm font-semibold transition-all ${
@@ -225,12 +219,24 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
                               ? 'bg-[#A8C995] text-slate-800'
                               : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
                           }`}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                         >
                           ${preset}
-                        </button>
+                        </motion.button>
                       ))}
                     </div>
-
+                    <div className="mt-4 text-center">
+                       <motion.p
+                        key={formData.budget}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-3xl font-bold text-slate-800"
+                      >
+                        ${formData.budget}
+                      </motion.p>
+                      <p className="text-slate-600 text-sm">per week</p>
+                    </div>
                     <input
                       type="range"
                       min="20"
@@ -238,36 +244,22 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
                       step="5"
                       value={formData.budget}
                       onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                      className="w-full h-2 rounded-lg appearance-none cursor-pointer slider"
+                      className="w-full h-2 mt-4 rounded-lg appearance-none cursor-pointer slider"
                       style={{ background: `linear-gradient(to right, #A8C995 ${budgetPercentage}%, #e2e8f0 ${budgetPercentage}%, #e2e8f0 100%)` }}
                     />
-                    <div className="flex justify-between text-xs text-slate-500 mt-1">
-                      <span>$20</span>
-                      <span>$150</span>
-                    </div>
-
-                    <div className="mt-4 text-center">
-                      <p className="text-3xl font-bold text-slate-800">${formData.budget}</p>
-                      <p className="text-slate-600 text-sm">per week</p>
-                    </div>
-
-                    <div className="mt-3 bg-slate-100 rounded-lg p-3 text-xs text-slate-600">
-                      Average weekly grocery budget is $50-80 per person
-                    </div>
-                  </div>
+                  </motion.div>
                 )}
 
                 {step === 3 && (
-                  <div>
+                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                     <h2 className="text-2xl font-bold mb-2 text-slate-800">Meals per Day</h2>
                     <p className="text-slate-600 text-sm mb-6">How many main meals do you eat?</p>
-
                     <div className="grid grid-cols-2 gap-4">
                       {[
                         { value: 2, label: '2 Meals', desc: 'Intermittent fasting' },
                         { value: 3, label: '3 Meals', desc: 'Traditional eating' }
                       ].map((option) => (
-                        <button
+                        <motion.button
                           key={option.value}
                           onClick={() => setFormData({ ...formData, meals: option.value })}
                           className={`p-6 rounded-xl transition-all ${
@@ -275,23 +267,22 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
                               ? 'bg-[#A8C995] text-slate-800 scale-105'
                               : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
                           }`}
+                           whileHover={{ scale: 1.03 }}
+                           whileTap={{ scale: 0.97 }}
                         >
                           <div className="text-3xl font-bold mb-2">{option.value}</div>
                           <div className="font-semibold">{option.label}</div>
                           <div className="text-xs opacity-70 mt-1">{option.desc}</div>
-                        </button>
+                        </motion.button>
                       ))}
                     </div>
-                  </div>
+                  </motion.div>
                 )}
 
                 {step === 4 && (
-                  <div>
-                    <h2 className="text-2xl font-bold mb-2 text-slate-800">Dietary Preferences </h2>
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                    <h2 className="text-2xl font-bold mb-2 text-slate-800">Dietary Preferences</h2>
                     <p className="text-slate-600 text-sm mb-4">Help us filter recipes for you</p>
-
-                    <div className="space-y-3 mb-4"></div>
-
                     <div>
                       <label className="text-slate-800 text-sm font-semibold mb-2 block">
                         Allergies or Restrictions (optional)
@@ -303,38 +294,42 @@ const OnboardingCard = ({ setShowOnboarding, setShowLoading }) => {
                         onChange={(e) => setFormData({ ...formData, allergies: e.target.value })}
                         className="w-full p-3 rounded-lg bg-slate-100 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#A8C995]"
                       />
+                       <p className="text-xs text-slate-500 mt-2">
+                         We'll automatically filter out these ingredients.
+                       </p>
                     </div>
-
-                    <div className="mt-3 bg-slate-100 rounded-lg p-3 text-xs text-slate-600">
-                      We'll automatically filter out these ingredients
-                    </div>
-                  </div>
+                  </motion.div>
                 )}
 
-                {/* Navigation buttons */}
-                <div className="flex gap-3 mt-6">
+                <div className="flex gap-3 mt-8">
                   {step > 1 && (
-                    <button
+                    <motion.button
                       onClick={handleBack}
-                      className="flex-1 px-4 py-3 rounded-lg bg-slate-200 text-slate-700 font-bold hover:bg-slate-300 transition-all"
+                      className="flex-1 px-4 py-3 rounded-lg bg-slate-200 text-slate-700 font-bold hover:bg-slate-300 transition-colors"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                     >
                       ← Back
-                    </button>
+                    </motion.button>
                   )}
                   {step < totalSteps ? (
-                    <button
+                    <motion.button
                       onClick={handleNext}
-                      className="flex-1 px-4 py-3 rounded-lg bg-[#A8C995] text-slate-800 font-bold hover:bg-[#94BF7F] hover:scale-105 transition-all shadow-lg"
+                      className="flex-1 px-4 py-3 rounded-lg bg-[#A8C995] text-slate-800 font-bold shadow-lg"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                     >
                       Next →
-                    </button>
+                    </motion.button>
                   ) : (
-                    <button
+                    <motion.button
                       onClick={handleSubmit}
-                      className="flex-1 px-4 py-3 rounded-lg bg-[#A8C995] text-slate-800 font-bold hover:bg-[#94BF7F] hover:scale-105 transition-all shadow-lg"
+                      className="flex-1 px-4 py-3 rounded-lg bg-[#628d45] text-white font-bold shadow-lg"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
                     >
                       Create My Plan!
-                    </button>
+                    </motion.button>
                   )}
                 </div>
               </div>
