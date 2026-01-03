@@ -4,6 +4,7 @@ This class covers authorization and authentication of a user, as well as basic c
 
 package spring.demo.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
@@ -18,16 +19,15 @@ import spring.demo.config.security.JwtService;
 import spring.demo.models.*;
 import spring.demo.models.repository.UserRepository;
 
-
 @RestController
-@RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class AuthController {
+@RequestMapping("api/auth")
+public class AuthController{
+private final UserRepository userRepository;
+private final JwtService jwtService;
+private final AuthenticationManager authenticationManager;
+private final PasswordEncoder passwordEncoder;
 
-    private final UserRepository userRepository;
-    private final JwtService jwtService;
-    private final AuthenticationManager authenticationManager;
-    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/signup")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
