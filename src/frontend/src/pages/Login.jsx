@@ -48,7 +48,7 @@ export default function AuthForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#674f2d] p-4 sm:p-6">
+    <div className="min-h-screen flex items-center justify-center bg-[#c7b499] p-4 sm:p-6">
       <div className="flex flex-col md:flex-row rounded-2xl shadow-xl overflow-hidden max-w-sm md:max-w-4xl w-full">
         {/* Create rounded div with image and text */}
         <div className="bg-[#f7f2e1] text-[#1a2e05] flex flex-col items-center justify-center p-6 md:p-8 w-full md:w-1/2 text-center">
