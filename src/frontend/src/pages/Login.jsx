@@ -17,7 +17,7 @@ export default function AuthForm() {
     e.preventDefault();
 
     const endpoint = isLogin ? 'login' : 'signup';
-    const url = `/api/auth/${endpoint}`;
+    const url = `http://localhost:8080/api/auth/${endpoint}`;
     let res;
     res = await fetch(url, {
       method: 'POST',
