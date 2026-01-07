@@ -107,7 +107,7 @@ public class IntegrationTests {
         userRepository.save(user.get());
 
 
-        mockMvc.perform(get("/api/meals/grocery-list"))
+        mockMvc.perform(get("/api/user/grocery-list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(1));
@@ -231,7 +231,7 @@ public class IntegrationTests {
     @Test
     void shouldReturn403WithoutAuth() throws Exception {
         // No @WithMockUser = no authentication
-        mockMvc.perform(get("/api/meals/groceryList"))
+        mockMvc.perform(get("/api/user/grocery-list"))
                 .andExpect(status().isForbidden());
     }
 
@@ -239,7 +239,7 @@ public class IntegrationTests {
     @WithMockUser(username = "test1@example.com")
     void shouldReturnEmptyList() throws Exception {
 
-        mockMvc.perform(get("/api/meals/grocery-list"))
+        mockMvc.perform(get("/api/user/grocery-list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(0));  // Check array is empty
