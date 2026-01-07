@@ -74,7 +74,7 @@ We offer an easy UI to navigate through to help you day-by-day to cook, and plan
 
 ## 🚀 Setup / Use
 
-### 🌐 No need to worry!
+### 🌐 Hosted Live
 Feel free to refer to the website currently, hosted full-stack on AWS EC2!
 
 **[App Link](https://plated-app.online/landing)**
