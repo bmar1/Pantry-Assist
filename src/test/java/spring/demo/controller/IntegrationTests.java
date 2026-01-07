@@ -107,7 +107,7 @@ public class IntegrationTests {
         userRepository.save(user.get());
 
 
-        mockMvc.perform(get("/api/meals/groceryList"))
+        mockMvc.perform(get("/api/meals/grocery-list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(1));
@@ -146,7 +146,7 @@ public class IntegrationTests {
         userRepository.save(user.get());
 
 
-        mockMvc.perform(get("/api/meals/allMeals"))
+        mockMvc.perform(get("/api/meals"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(2));
@@ -239,7 +239,7 @@ public class IntegrationTests {
     @WithMockUser(username = "test1@example.com")
     void shouldReturnEmptyList() throws Exception {
 
-        mockMvc.perform(get("/api/meals/groceryList"))
+        mockMvc.perform(get("/api/meals/grocery-list"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(0));  // Check array is empty
