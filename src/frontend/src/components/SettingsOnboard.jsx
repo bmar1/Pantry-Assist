@@ -24,7 +24,7 @@ const SettingsOnboard = ({ setShowPreferences }) => {
     setShowPreferences(false);
 
     try {
-      const res = await fetch('api/onboarding', {
+      const res = await fetch('api/user/preferences', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -63,9 +63,7 @@ const SettingsOnboard = ({ setShowPreferences }) => {
           ×
         </button>
 
-        <h1 className="text-3xl md:text-4xl font-extrabold text-center mb-6">
-          Update Preferences
-        </h1>
+        <h1 className="text-3xl md:text-4xl font-extrabold text-center mb-6">Update Preferences</h1>
 
         <div className="space-y-6">
           {/* Calories */}

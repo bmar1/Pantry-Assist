@@ -135,7 +135,7 @@ public class MainController {
         return ResponseEntity.ok(recipieList);
     }
 
-    @PostMapping("/meals/newPlan")
+    @PostMapping("/meal-plans")
     @Transactional
     public ResponseEntity<ArrayList> newMealPlan(
                                                 @AuthenticationPrincipal UserDetails userDetails)
@@ -231,7 +231,7 @@ public class MainController {
     }
 
     //updates a list of user preferences (calories, meals and goals)
-    @PostMapping("/user/updatePref")
+    @PostMapping("/user/preferences")
     public ResponseEntity<?> updatePref(@RequestBody UserPreference pref, @AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
         String email = userDetails.getUsername();
         if (email == null) {
@@ -308,7 +308,7 @@ public class MainController {
     }
 
     //Returns all user meals by fetching from DB, accepting a number of meals to return as well
-    @GetMapping("/meals/allMeals")
+    @GetMapping("/meals")
     @Transactional
     public ResponseEntity<List<Recipe>> meals(@AuthenticationPrincipal UserDetails userDetails, @RequestParam(required = false) Integer numIngredients) {
         String email = userDetails.getUsername();
@@ -350,7 +350,7 @@ public class MainController {
             return ResponseEntity.ok(recipe.get());
         else return ResponseEntity.status(404).build();
     }
-    @GetMapping("/meals/groceryList")
+    @GetMapping("/user/grocery-list")
     public List<Ingredient> groceryList(@AuthenticationPrincipal UserDetails userDetails) {
         String email = userDetails.getUsername();
 
