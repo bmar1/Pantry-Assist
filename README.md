@@ -1,9 +1,6 @@
 # <img src="src/frontend/public/favicon-v1.png" alt="Plated Icon" width="27" height="27"> Plated
 
-
-
 A full-stack application aimed to help you save food, tighten your budget, and plan interesting, tasteful meals from around the world! 🌎✨
-
 
 ![Build Status](https://github.com/bmar1/Pantry-Assist/workflows/Deploy%20to%20EC2/badge.svg)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-green)
@@ -37,6 +34,12 @@ This project, 'plated' aims to serve those who are on a budget or want help trac
 
 ---
 
+## Why use it?
+
+Plated offers a simple solution to everyday issues, meal planning and buying groceries. Instead of spending more time figuring out what to get, just get a meal plan on us, and only buy the groceries and cook the delicious meals!
+
+---
+
 ## Getting started
 
 Currently, plated is only hosted with EC2, full stack, however if you'd run it yourself you need:
@@ -50,6 +53,7 @@ git clone https://github.com/bmar1/Plated.git
 npm install
 npm start
 ```
+---
 
 ## ⚙️ Features
 
@@ -81,6 +85,8 @@ Feel free to refer to the website currently, hosted full-stack on AWS EC2!
 
 Frontend Only Host:
 https://pantry-assist.vercel.app/landing
+
+---
 
 ### Contributing
 
