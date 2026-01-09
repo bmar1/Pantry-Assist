@@ -210,7 +210,7 @@ export default function Nav({
                 style={{ filter: 'invert(1) brightness(2)' }}
               />
             </Link>
-            <Link to="/analytics" className="hover:bg-[#5A7A4D] p-2 rounded-lg">
+            <Link to="" className="hover:bg-[#5A7A4D] p-2 rounded-lg">
               <img
                 src="/icons/result.png"
                 alt="analytics"

@@ -40,6 +40,7 @@ public class Ingredient {
     private Double carbs;
     @Column(nullable = true)
     private Double fat;
+    @Column(name = "product_url", updatable = false)
     private String productUrl;
     private String imageUrl;
 
